@@ -31,7 +31,27 @@ export const projectData: Project[] = [
     src: 'netscore/images/PXL_20250301_000104064.jpg',
     srcType: 'image',
     routeName: 'netscore'
-  }
+  },
+  {
+    name: 'Plant Sniffer',
+    date: '2023-08-30',
+    keywords: ['Hardware', 'Software', 'IoT', 'Plant Care', '3D Modeling'],
+    description: 'A portable soil moisture monitor with calibration and multiple visualization modes, built in one week for an Erasmus+ nature program.',
+    status: 'Completed',
+    src: 'plant-sniffer/videos/PXL_20230904_143511372.mp4',
+    srcType: 'video',
+    routeName: 'plant-sniffer'
+  },
+  {
+    name: 'Home OpenSCAD',
+    date: '2020-04-28',
+    keywords: ['Hardware', '3D Modeling', 'Urban Design'],
+    description: "A detailed 3D-printed scale model of Tokyo's famous 'Littlest Tokyo' district, showcasing intricate architecture and urban planning.",
+    status: 'Completed',
+    src: 'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
+    srcType: 'image',
+    routeName: 'home-openscad'
+  },
 ];
 
 // const projects = ref([
@@ -116,15 +136,7 @@ export const projectData: Project[] = [
 //       src: 'comando-rita/videos/PXL_20240819_194017048_small.mp4',
 //       routeName: 'comando-rita'
 //     },
-//     {
-//       name: 'Home OpenSCAD Models',
-//       date: '2023',
-//       keywords: ['Hardware', '3D Modeling', 'Urban Design'],
-//       description: "A detailed 3D-printed scale model of Tokyo's famous 'Littlest Tokyo' district, showcasing intricate architecture and urban planning.",
-//       srcType: 'image',
-//       src: 'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
-//       routeName: 'home-openscad'
-//     },
+
 //     {
 //       name: 'Plant Sniffer',
 //       date: 'August 2025',

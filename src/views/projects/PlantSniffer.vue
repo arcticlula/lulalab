@@ -1,206 +1,144 @@
 <template>
-  <div class="project-view">
-    <n-h1>Mood Light</n-h1>
-    <n-p><strong>September 2025</strong></n-p>
-    <n-blockquote>
-      A diffused ambient light built from repurposed materials, controlled directly from any modern web browser using the Web Bluetooth API.
-    </n-blockquote>
-    <div class="carousel-wrapper">
-      <MediaCarousel :media="media" />
-    </div>
-    <n-p><strong>The Story</strong></n-p>
+  <ProjectTemplate id="plant-sniffer" :media="media" :models="models">
+  <n-p class="squid-semi-title">The Story</n-p>
     <n-p>
-      This project was born from a happy accident. I had some leftover WS2811 LED strips and a few plexiglass samples that I had mistakenly ordered for the NetScore project - 
-      I thought they would be clear, but they arrived translucent. This mistake, however, turned out to be a pretty good material for a light diffuser.
-      I designed a simple enclosure in Onshape, consisting of a 3D-printed frame that wraps around the plexiglass panel, with the LED strip running along the inner perimeter. 
-      The result is a soft, uniform glow that fills the room - dependant on the acrylic used. 
-      The light is powered by a 12V transformer and an ESP32-C3, the LEDs are controlled wirelessly via a web app using the Web Bluetooth API, 
-      allowing you to connect and change colors on the fly from a browser.
+      This project was created in about a week to bring something personal to an Erasmus+ program focused on nature. 
+      I'll admit - I really pushed hard on the last few days to get it done. The circuit was semi-planned and assembled using perfboard 
+      with pre-made modules (microcontroller, battery charger, and humidity sensor), which meant the 3D-printed enclosure that holds and 
+      protects everything went through several iterations to get it right.
     </n-p>
-    <n-p><strong>Key Features</strong></n-p>
+    <n-p>
+      The device has two inputs: a push button and the humidity sensor. It displays information on a round display, 
+      allowing you to calibrate minimum values (when the soil is dry) and maximum values (after watering). 
+      There are also three different visualization modes for humidity levels—the result is the same, but the animations vary.
+    </n-p>
+    <n-p class="squid-semi-title">Key Features</n-p>
     <n-ul>
-      <n-li><strong>Soft, Diffused Lighting:</strong> Uses a WS2811 LED strip paired with a translucent plexiglass panel for a smooth, ambient glow.</n-li>
-      <n-li><strong>Custom Enclosure:</strong> The frame was parametrically designed in Onshape and 3D-printed.</n-li>
-      <n-li><strong>Browser-Based Control:</strong> Wirelessly change colors and patterns using the Web Bluetooth API - no native app required.</n-li>
-      <n-li><strong>Repurposed Components:</strong> Built from leftover materials from previous projects.</n-li>
+      <n-li>Calibration System: <span class="squid-text-alt">Adjust minimum and maximum relative humidity values based on your specific plant and soil conditions.</span></n-li>
+      <n-li>Visual Feedback: <span class="squid-text-alt">Three different animation modes to display humidity levels on a circular display.</span></n-li>
+      <n-li>Portable Design: <span class="squid-text-alt">Battery-powered with integrated charging module for convenience.</span></n-li>
+      <n-li>Custom Enclosure: <span class="squid-text-alt">3D-printed frame designed to house perfboard-based circuit and modules.</span></n-li>
     </n-ul>
-    <n-p><strong>Tech Stack</strong></n-p>
+    <n-p class="squid-semi-title">Tech Stack</n-p>
     <n-ul>
-      <n-li><strong>Hardware:</strong> ESP32-C3, WS2811 individually addressable LED strip, Translucent Plexiglass.</n-li>
-      <n-li><strong>Control Protocol:</strong> Web Bluetooth API.</n-li>
-      <n-li><strong>3D Design:</strong> Onshape.</n-li>
-      <n-li><strong>Fabrication:</strong> 3D Printing.</n-li>
+      <n-li>Hardware: <span class="squid-text-alt">RP2040 microcontroller, capacitive soil moisture sensor, GC9A01 Round LCD, battery charging module.</span></n-li>
+      <n-li>Software: <span class="squid-text-alt">Custom firmware written in C/C++ using the Arduino framework.</span></n-li>
+      <n-li>3D Design: <span class="squid-text-alt">Onshape (multiple iterations to fit the perfboard assembly).</span></n-li>
+      <n-li>Circuit Board Technique: <span class="squid-text-alt">Perfboard with pre-made modules.</span></n-li>
     </n-ul>
-    <n-p><strong>Challenges & Lessons Learned</strong></n-p>
+    <n-p class="squid-semi-title">Challenges & Lessons Learned</n-p>
     <n-p>
-      The primary lesson from this project was the value of creative repurposing and "happy accidents." 
-      The translucent plexiglass, initially a purchasing mistake for another project, became the key component that defined the aesthetic of this one. 
-      It’s a great reminder that sometimes the best designs come from adapting to unexpected materials and finding new potential in leftovers. 
-      The project is also a great exploration of the power of Web Bluetooth for creating seamless hardware interactions without needing to develop a dedicated mobile application.
+      Working under a one-week deadline was challenging, especially since the project required developing both firmware 
+      and hardware simultaneously. Using pre-made modules on perfboard was a practical time-saver, but it also meant 
+      the enclosure design needed to be flexible and went through multiple revisions. This project reinforced the 
+      importance of modular design and the value of rapid prototyping when time is limited. Sometimes you just have to 
+      commit and push through on that last day to make it happen.
     </n-p>
-    <n-p><strong>Links</strong></n-p>
-    <n-p>
-
-    </n-p>
-    <n-p><strong>3D Model Viewer</strong></n-p>
-    <div>
-    </div>
-  </div>
+    <n-p class="squid-semi-title">Links</n-p>
+    <n-ul>
+      <n-li><n-a href="toDo">[GitHub Repository]</n-a></n-li>
+      <n-li><n-a href="https://cad.onshape.com/documents/f09e939da9b2461bcee0bb02/w/fad8a904ca1fb72f1758850a/e/9bfed1484d204b0a318f43eb?renderMode=0&uiState=69237d3c0628a6c66d000ea9">[OnShape]</n-a></n-li>
+    </n-ul>
+  </ProjectTemplate>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import MediaCarousel from '../../components/MediaCarousel.vue';
-import { IMedia } from '../../models/media';
+import ProjectTemplate from '../../components/ProjectTemplate.vue';
+import { IMedia, ICascadeCategory } from '../../models/media';
 
 const media = ref<IMedia[]>([
   {
     type: 'video',
     src: 'plant-sniffer/videos/PXL_20230904_143511372.mp4',
+    description: 'demo of the device through the calibration process'
   },
-
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230830_235156568.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230830_235208335.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230831_164257589.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230831_174424917.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230831_174438762.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230831_174952820.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230831_190110418.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230831_190326297.jpg' },
+  { type: 'image', src: 'plant-sniffer/images/button.jpg', description: 'the button module build' },
+  { type: 'image', src: 'plant-sniffer/images/perfboard_body.jpg', description: 'perfboard body with soldered modules' },
+  { type: 'image', src: 'plant-sniffer/images/PXL_20230831_190110418.jpg', description: 'testing the display before soldering' },
   { type: 'image', src: 'plant-sniffer/images/PXL_20230831_190332076.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230901_191630490.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230901_191642741.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230901_191710199.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230901_195810073.jpg' },
+  { type: 'image', src: 'plant-sniffer/images/PXL_20230901_191710199.jpg', description: '(hopefully) making all the connections before fitting the display' },
+  { type: 'image', src: 'plant-sniffer/images/PXL_20230901_195810073.jpg', description: 'view from the back after display assembly' },
   { type: 'image', src: 'plant-sniffer/images/PXL_20230901_195818712.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230902_202053748.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230904_134746450.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230904_134752273.jpg' }
+  { type: 'image', src: 'plant-sniffer/images/PXL_20230902_202053748.jpg', description: 'some testing before final assembly' },
+  { type: 'image', src: 'plant-sniffer/images/no_pants.jpg', description: 'still missing it\'s pants' }
 ]);
 
-
-// const models = ref<IObjectMedia[]>([
-//   {
-//     name: 'Bottom',
-//     obj: [
-//       {
-//         name: 'v0.1',
-//         src: 'plant-sniffer/models/plant-sniffer-bottom-v0.1.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v1.0',
-//         src: 'plant-sniffer/models/plant-sniffer-bottom-v1.0.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v1.1',
-//         src: 'plant-sniffer/models/plant-sniffer-bottom-v1.1.stl',
-//         colorHex: '0xff7f00'
-//       }
-//     ]
-//   },
-//  {
-//     name: 'Body',
-//     obj:       
-//     {
-//       name: 'v0.1',
-//       src: 'plant-sniffer/models/plant-sniffer-body-v0.1.stl',
-//       colorHex: '0xff7f00'
-//     },
-//   },
-//   {
-//     name: 'Battery Holder',
-//     obj: [
-//       {
-//         name: 'v1.0',
-//         src: 'plant-sniffer/models/plant-sniffer-bt-holder-v1.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v1.1',
-//         src: 'plant-sniffer/models/plant-sniffer-bt-holder-v1.1.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v1.2',
-//         src: 'plant-sniffer/models/plant-sniffer-bt-holder-v1.2.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v1.3',
-//         src: 'plant-sniffer/models/plant-sniffer-bt-holder-v1.3.stl',
-//         colorHex: '0xff7f00'
-//       }
-//     ]
-//   },
-
-//   {
-//     name: 'Handle',
-//     obj: [
-//       {
-//         name: 'v1.0',
-//         src: 'plant-sniffer/models/plant-sniffer-handle-v1.0.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v1.1',
-//         src: 'plant-sniffer/models/plant-sniffer-handle-v1.1.stl',
-//         colorHex: '0xff7f00'
-//       }
-//     ]
-//   },
-
-//   {
-//     name: 'Top',
-//     obj: [
-//       {
-//         name: 'v0.1',
-//         src: 'plant-sniffer/models/plant-sniffer-top-v0.1.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v0.2',
-//         src: 'plant-sniffer/models/plant-sniffer-top-v0.2.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v0.21',
-//         src: 'plant-sniffer/models/plant-sniffer-top-v0.21.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v0.3',
-//         src: 'plant-sniffer/models/plant-sniffer-top-v0.3.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v0.4',
-//         src: 'plant-sniffer/models/plant-sniffer-top-v0.4.stl',
-//         colorHex: '0xff7f00'
-//       }
-//     ]
-//   }
-// ]);
-
+const models = ref<ICascadeCategory[]>([{
+  key: 'pl-parts',
+  label: 'Parts',
+  children: [
+    {
+      key: 'pl-bottom',
+      label: 'Bottom',
+      children: [
+        { key: 'pl-bottom-v0.5', label: '0.5', src: 'plant-sniffer/models/plant-sniffer-bottom-v0.5.stl', colorHex: '0xff7f00' },
+        { key: 'pl-bottom-v0.9', label: '0.9', src: 'plant-sniffer/models/plant-sniffer-bottom-v0.9.stl', colorHex: '0xff7f00' },
+        { key: 'pl-bottom-v1.0', label: '1.0', src: 'plant-sniffer/models/plant-sniffer-bottom-v1.0.stl', colorHex: '0xff7f00' }
+      ]
+    },
+    {
+      key: 'pl-body',
+      label: 'Body',
+      children: [
+        { key: 'pl-body-v1.0', label: '1.0', src: 'plant-sniffer/models/plant-sniffer-body-v1.0.stl', colorHex: '0xff7f00' }
+      ]
+    },
+    {
+      key: 'pl-battery-holder',
+      label: 'Battery Holder',
+      children: [
+        { key: 'pl-bth-v0.1', label: '0.1', src: 'plant-sniffer/models/plant-sniffer-bat-holder-v0.1.stl', colorHex: '0xff7f00' },
+        { key: 'pl-bth-v0.5', label: '0.5', src: 'plant-sniffer/models/plant-sniffer-bat-holder-v0.5.stl', colorHex: '0xff7f00' },
+        { key: 'pl-bth-v0.8', label: '0.8', src: 'plant-sniffer/models/plant-sniffer-bat-holder-v0.8.stl', colorHex: '0xff7f00' },
+        { key: 'pl-bth-v1.0', label: '1.0', src: 'plant-sniffer/models/plant-sniffer-bat-holder-v1.0.stl', colorHex: '0xff7f00' }
+      ]
+    },
+    {
+      key: 'pl-handle',
+      label: 'Handle',
+      children: [
+        { key: 'pl-handle-v0.5', label: '0.5', src: 'plant-sniffer/models/plant-sniffer-handle-v0.5.stl', colorHex: '0xff7f00' },
+        { key: 'pl-handle-v1.0', label: '1.0', src: 'plant-sniffer/models/plant-sniffer-handle-v1.0.stl', colorHex: '0xff7f00' }
+      ]
+    },
+    {
+      key: 'pl-top',
+      label: 'Top',
+      children: [
+        { key: 'pl-top-v0.1', label: '0.1', src: 'plant-sniffer/models/plant-sniffer-top-v0.1.stl', colorHex: '0xff7f00' },
+        { key: 'pl-top-v0.5', label: '0.5', src: 'plant-sniffer/models/plant-sniffer-top-v0.5.stl', colorHex: '0xff7f00' },
+        { key: 'pl-top-v0.51', label: '0.51', src: 'plant-sniffer/models/plant-sniffer-top-v0.51.stl', colorHex: '0xff7f00' },
+        { key: 'pl-top-v0.8', label: '0.8', src: 'plant-sniffer/models/plant-sniffer-top-v0.8.stl', colorHex: '0xff7f00' },
+        { key: 'pl-top-v1.0', label: '1.0', src: 'plant-sniffer/models/plant-sniffer-top-v1.0.stl', colorHex: '0xff7f00' }
+      ]
+    }]
+},
+{
+  key: 'pl-assembly',
+  label: 'Assembly',
+  children: [
+    {
+      key: 'pl-assembly-v1.0',
+      label: 'V1.0',
+      children: [
+        {
+          key: 'pl-v1.0',
+          label: 'v1.0',
+          isGroup: true,
+          children: [
+            { key: 'pl-bottom-v1.0', label: 'Bottom', src: 'plant-sniffer/models/assembly/plant-sniffer-bottom-v1.0.stl', colorHex: '0xff7f00', explodeOffset: {x: 0, y: -15, z: -10} },
+            { key: 'pl-body-v1.0', label: 'Body', src: 'plant-sniffer/models/assembly/plant-sniffer-body-v1.0.stl', colorHex: '0xdcccec', explodeOffset: {x: 0, y: -15, z: 0} },
+            { key: 'pl-top-v1.0', label: 'Top', src: 'plant-sniffer/models/assembly/plant-sniffer-top-v1.0.stl', colorHex: '0xff7f00', explodeOffset: {x: 0, y: 0, z: 0} },
+            { key: 'pl-bth-v1.0', label: 'Battery Holder', src: 'plant-sniffer/models/assembly/plant-sniffer-bat-holder-v1.0.stl', colorHex: '0xdcccec', explodeOffset: {x: -10, y: 0, z: 0} },
+            { key: 'pl-handle-v1.0', label: 'Handle', src: 'plant-sniffer/models/assembly/plant-sniffer-handle-v1.0.stl', colorHex: '0xdcccec', explodeOffset: {x: 10, y: 0, z: 0} }
+          ]
+        }
+      ]
+    }
+  ]
+}]);
 </script>
 
 <style scoped lang="sass">
-.project-view
-  padding: 0 32px
-  text-align: justify
-  hyphens: auto
-  .n-h1
-    margin-bottom: 0
-  .n-card
-    margin-top: 24px
-
-.carousel-wrapper
-  display: flex
-  justify-content: center
-  margin: 24px 0
-
-@media (max-width: 800px)
-  .project-view
-    padding: 0 4px !important
 </style>

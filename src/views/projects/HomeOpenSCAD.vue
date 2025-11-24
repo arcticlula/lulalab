@@ -1,185 +1,118 @@
 <template>
-  <div class="project-view">
-    <n-h1>Mood Light</n-h1>
-    <n-p><strong>September 2025</strong></n-p>
-    <n-blockquote>
-      A diffused ambient light built from repurposed materials, controlled directly from any modern web browser using the Web Bluetooth API.
-    </n-blockquote>
-    <div class="carousel-wrapper">
-      <MediaCarousel :media="media" />
-    </div>
-    <n-p><strong>The Story</strong></n-p>
+  <ProjectTemplate id="home-openscad" :media="media" :models="models">
+    <n-p class="squid-semi-title">The Story</n-p>
     <n-p>
-      This project was born from a happy accident. I had some leftover WS2811 LED strips and a few plexiglass samples that I had mistakenly ordered for the NetScore project - 
-      I thought they would be clear, but they arrived translucent. This mistake, however, turned out to be a pretty good material for a light diffuser.
-      I designed a simple enclosure in Onshape, consisting of a 3D-printed frame that wraps around the plexiglass panel, with the LED strip running along the inner perimeter. 
-      The result is a soft, uniform glow that fills the room - dependant on the acrylic used. 
-      The light is powered by a 12V transformer and an ESP32-C3, the LEDs are controlled wirelessly via a web app using the Web Bluetooth API, 
-      allowing you to connect and change colors on the fly from a browser.
+      This OpenSCAD project was a comprehensive design exercise for home furnishings and fixtures. 
+      The collection includes various pieces designed with precise parametric modeling, from seating to storage solutions.
+      Each piece was carefully crafted to explore spatial relationships and fabrication possibilities. 
+      This project represents a significant body of work in 3D furniture design using parametric modeling techniques. 
     </n-p>
-    <n-p><strong>Key Features</strong></n-p>
+    <n-p class="squid-semi-title">Furniture Collection</n-p>
     <n-ul>
-      <n-li><strong>Soft, Diffused Lighting:</strong> Uses a WS2811 LED strip paired with a translucent plexiglass panel for a smooth, ambient glow.</n-li>
-      <n-li><strong>Custom Enclosure:</strong> The frame was parametrically designed in Onshape and 3D-printed.</n-li>
-      <n-li><strong>Browser-Based Control:</strong> Wirelessly change colors and patterns using the Web Bluetooth API - no native app required.</n-li>
-      <n-li><strong>Repurposed Components:</strong> Built from leftover materials from previous projects.</n-li>
+      <n-li>Speaker: <span class="squid-text-alt">Living room speaker design</span></n-li>
+      <n-li>Bookcase: <span class="squid-text-alt">Storage solution for books and displays</span></n-li>
+      <n-li>TV Stand Drawer: <span class="squid-text-alt">Drawer component for TV entertainment unit</span></n-li>
+      <n-li>TV Stand: <span class="squid-text-alt">Main TV entertainment unit</span></n-li>
+      <n-li>Dining Room Table: <span class="squid-text-alt">Large dining surface</span></n-li>
+      <n-li>Support Table: <span class="squid-text-alt">Auxiliary side table</span></n-li>
+      <n-li>Puff: <span class="squid-text-alt">Ottoman seating</span></n-li>
+      <n-li>Sofa (Large): <span class="squid-text-alt">Main seating furniture</span></n-li>
+      <n-li>Armchair: <span class="squid-text-alt">Compact seating piece</span></n-li>
     </n-ul>
-    <n-p><strong>Tech Stack</strong></n-p>
+    <n-p class="squid-semi-title">Design Approach</n-p>
+    <n-p>
+      All pieces were designed using OpenSCAD, a script-based CAD program that emphasizes parametric design. 
+      This approach allows for precise control over dimensions and enables rapid iteration and adaptation. 
+      The design philosophy prioritized both form and function, with each piece considering spatial relationships and practical use cases.
+    </n-p>
+    <n-p class="squid-semi-title">Tech Stack</n-p>
     <n-ul>
-      <n-li><strong>Hardware:</strong> ESP32-C3, WS2811 individually addressable LED strip, Translucent Plexiglass.</n-li>
-      <n-li><strong>Control Protocol:</strong> Web Bluetooth API.</n-li>
-      <n-li><strong>3D Design:</strong> Onshape.</n-li>
-      <n-li><strong>Fabrication:</strong> 3D Printing.</n-li>
+      <n-li>CAD Design: <span class="squid-text-alt">OpenSCAD</span></n-li>
+      <n-li>Approach: <span class="squid-text-alt">Parametric modeling</span></n-li>
+      <n-li>Output Format: <span class="squid-text-alt">STL for 3D visualization</span></n-li>
     </n-ul>
-    <n-p><strong>Challenges & Lessons Learned</strong></n-p>
-    <n-p>
-      The primary lesson from this project was the value of creative repurposing and "happy accidents." 
-      The translucent plexiglass, initially a purchasing mistake for another project, became the key component that defined the aesthetic of this one. 
-      It’s a great reminder that sometimes the best designs come from adapting to unexpected materials and finding new potential in leftovers. 
-      The project is also a great exploration of the power of Web Bluetooth for creating seamless hardware interactions without needing to develop a dedicated mobile application.
-    </n-p>
-    <n-p><strong>Links</strong></n-p>
-    <n-p>
-
-    </n-p>
-    <n-p><strong>3D Model Viewer</strong></n-p>
-    <div>
-      <!-- <STLViewer :models="models" /> -->
-    </div>
-  </div>
+    <n-p class="squid-semi-title">Links</n-p>
+    <n-ul>
+      <n-li><n-a href="toDo">[GitHub Repository]</n-a></n-li>
+    </n-ul>
+  </ProjectTemplate>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import MediaCarousel from '../../components/MediaCarousel.vue';
-// import STLViewer from '../../components/STLViewer.vue';
-import { IMedia } from '../../models/media';
+import ProjectTemplate from '../../components/ProjectTemplate.vue';
+import { IMedia, ICascadeCategory } from '../../models/media';
 
 const media = ref<IMedia[]>([
   {
     type: 'video',
-    src: 'mood-light/videos/PXL_20250911_232403363.mp4',
-    poster: 'mood-light/images/PXL_20250911_102431507.jpg',
+    src: 'home-scad/videos/VID_20200501_205604.mp4',
   },
-  {
-    type: 'video',
-    src: 'mood-light/videos/PXL_20250908_162742176.mp4',
-    poster: 'mood-light/images/PXL_20250908_162742176.jpg',
-  },
-  {
-    type: 'image',
-    src: 'mood-light/images/PXL_20250910_130605116.jpg'
-  },
-  {
-    type: 'image',
-    src: 'mood-light/images/PXL_20250911_102401092.jpg'
-  },
-  {
-    type: 'image',
-    src: 'mood-light/images/PXL_20250911_102415897.jpg'
-  },
-  {
-    type: 'image',
-    src: 'mood-light/images/PXL_20250911_102431507.jpg'
-  },
-  {
-    type: 'image',
-    src: 'mood-light/images/PXL_20250911_112415716.jpg'
-  }
+  { type: 'image', src: 'home-scad/images/IMG-20200428-WA0016.jpg', description: 'Early speaker enclosure concept' },
+  { type: 'image', src: 'home-scad/images/IMG-20200428-WA0018.jpg', description: 'Bookcase module parametric layout' },
+  { type: 'image', src: 'home-scad/images/IMG-20200429-WA0002.jpg', description: 'TV stand structural framing in OpenSCAD' },
+  { type: 'image', src: 'home-scad/images/IMG-20200429-WA0007.jpg', description: 'Dining table proportional study' },
+  { type: 'image', src: 'home-scad/images/IMG-20200507-WA0010.jpg', description: 'Support table leg joinery view' },
+  { type: 'image', src: 'home-scad/images/IMG_20200430_113830.jpg', description: 'Armchair and puff scale reference' }
 ]);
 
-  // const models = ref<IObjectMedia[]>([
-  //   {
-  //     name: 'Speaker',
-  //     obj: {
-  //       name: '1.0',
-  //       src: 'home-scad/models/coluna-sala-30.stl',
-  //       colorHex: '0xff7f00'
-  //     },
-  //   },
-  //   {
-  //     name: 'Bookcase',
-  //     obj: {
-  //       name: '0.1',
-  //       src: 'home-scad/models/estante-30.stl',
-  //       colorHex: '0xff7f00'
-  //     },
-  //   },
-  //   {
-  //     name: 'TV Stand Drawer',
-  //     obj: {
-  //       name: '1.0',
-  //       src: 'home-scad/models/gaveta-movel-tv-30.stl',
-  //       colorHex: '0xff7f00'
-  //     },
-  //   },
-  //   {
-  //     name: 'TV Stand',
-  //     obj: {
-  //       name: '1.0',
-  //       src: 'home-scad/models/movel-tv-30.stl',
-  //       colorHex: '0xff7f00'
-  //     },
-  //   },
-  //   {
-  //     name: 'Dining Room Table',
-  //     obj: {
-  //       name: '1.0',
-  //       src: 'home-scad/models/mesa-sala-30.stl',
-  //       colorHex: '0xff7f00'
-  //     },
-  //   },
-  //   {
-  //     name: 'Support Table',
-  //     obj: {
-  //       name: '1.0',
-  //       src: 'home-scad/models/mesinha-sala-30.stl',
-  //       colorHex: '0xff7f00'
-  //     },
-  //   },
-  //   {
-  //     name: 'Puff',
-  //     obj: {
-  //       name: '1.0',
-  //       src: 'home-scad/models/puff-30.stl',
-  //       colorHex: '0xff7f00'
-  //     },
-  //   },
-  //   {
-  //     name: 'Sofa',
-  //     obj: {
-  //       name: '1.0',
-  //       src: 'home-scad/models/sofa-grande-30.stl',
-  //       colorHex: '0xff7f00'
-  //     },
-  //   },
-  //   {
-  //     name: 'Armchair',
-  //     obj: {
-  //       name: '1.0',
-  //       src: 'home-scad/models/sofa-pequeno-30.stl',
-  //       colorHex: '0xff7f00'
-  //     },
-  //   }
-  // ]);
+const models = ref<ICascadeCategory[]>([
+  {
+    key: 'hs-speaker',
+    label: 'Speaker',
+    src: 'home-scad/models/coluna-sala-30.stl',
+    colorHex: '0xff7f00'
+  },
+  {
+    key: 'hs-bookcase',
+    label: 'Bookcase',
+    src: 'home-scad/models/estante-30.stl',
+    colorHex: '0xff7f00'
+  },
+  {
+    key: 'hs-tv-drawer',
+    label: 'TV Stand Drawer',
+    src: 'home-scad/models/gaveta-movel-tv-30.stl',
+    colorHex: '0xff7f00'
+  },
+  {
+    key: 'hs-tv-stand',
+    label: 'TV Stand',
+    src: 'home-scad/models/movel-tv-30.stl',
+    colorHex: '0xff7f00'
+  },
+  {
+    key: 'hs-dining-table',
+    label: 'Dining Room Table',
+    src: 'home-scad/models/mesa-sala-30.stl',
+    colorHex: '0xff7f00'
+  },
+  {
+    key: 'hs-support-table',
+    label: 'Support Table',
+    src: 'home-scad/models/mesinha-sala-30.stl',
+    colorHex: '0xff7f00'
+  },
+  {
+    key: 'hs-puff',
+    label: 'Puff',
+    src: 'home-scad/models/puff-30.stl',
+    colorHex: '0xff7f00'
+  },
+  {
+    key: 'hs-sofa-large',
+    label: 'Sofa (Large)',
+    src: 'home-scad/models/sofa-grande-30.stl',
+    colorHex: '0xff7f00'
+  },
+  {
+    key: 'hs-armchair',
+    label: 'Armchair',
+    src: 'home-scad/models/sofa-pequeno-30.stl',
+    colorHex: '0xff7f00'
+  }
+]);
 </script>
 
 <style scoped lang="sass">
-.project-view
-  padding: 0 32px
-  text-align: justify
-  hyphens: auto
-  .n-h1
-    margin-bottom: 0
-  .n-card
-    margin-top: 24px
-
-.carousel-wrapper
-  display: flex
-  justify-content: center
-  margin: 24px 0
-
-@media (max-width: 800px)
-  .project-view
-    padding: 0 4px !important
 </style>

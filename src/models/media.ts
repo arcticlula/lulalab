@@ -6,10 +6,9 @@ export interface IMedia {
 }
 
 export interface IModel {
-  label_: string;
+  label: string;
   key: string;
   src: string;
-  mtl?: string;
   colorHex?: string;
   opacity?: number;
   explodeOffset?: { x: number; y: number; z: number };
@@ -20,4 +19,9 @@ export interface ICascadeCategory {
   key: string;
   children?: Array<ICascadeCategory | IModel>;
   isGroup?: boolean;
+  src?: string;
+  mtl?: string;
+  colorHex?: string;
+  opacity?: number;
+  explodeOffset?: { x: number; y: number; z: number };
 }

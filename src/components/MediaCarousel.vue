@@ -1,7 +1,7 @@
 <template>
   <div class="carousel-div">
     <n-image-group>
-      <n-carousel class="carousel" :show-arrow="!isMobile" :show-dots="isMobile" dot-type="line" @update:current-index="i => selectedIndex = i">
+      <n-carousel class="carousel" :show-arrow="!isMobile" :show-dots="isMobile" dot-type="line" @update:current-index="(i: number) => selectedIndex = i">
         <template v-for="(item) in media">
             <n-image
               v-if="item.type === 'image'"
@@ -30,6 +30,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { useMobileDetection } from '../composables/useMobileDetection';
 import { IMedia } from '../models/media';
 
@@ -72,9 +73,6 @@ defineProps<{ media: IMedia[] }>()
 @media (max-width: 800px)
   .carousel
     height: auto !important
-    // :deep(.n-carousel__dots)
-    //   position: absolute
-    //   bottom: 40px
 
   .carousel-media
     width: 100%

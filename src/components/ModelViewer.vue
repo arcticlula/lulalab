@@ -2,7 +2,7 @@
   <div class="options-div">
     <div class="select-div">
       <n-cascader class="select-model" v-model:value="cascaderValue" :options="cascadeOptions" :show-path="true" check-strategy="child"/>
-      <n-button class="select-button" @click="toggleExplode" tertiary v-if="selectedVersionIsGroup">
+      <n-button class="select-button" @click="toggleExplode" tertiary v-if="selectedVersionIsGroup && !props.disableExplode">
         <template #icon>
           <n-icon>
             <ArrowMoveInward20Regular v-if="isExploded" />
@@ -46,7 +46,13 @@ import { computed, onMounted, ref, watch } from 'vue';
 
 import { IModel, ICascadeCategory } from '../models/media';
 
-const props = defineProps<{ models: ICascadeCategory[], backgroundColor?: number }>();
+type CascaderOption = {
+  label: string;
+  value: string;
+  children?: CascaderOption[];
+};
+
+const props = defineProps<{ models: ICascadeCategory[], backgroundColor?: number, disableExplode?: boolean }>();
 
 const viewerContainer = ref<HTMLDivElement | null>(null);
 
@@ -75,11 +81,12 @@ let modelSize = 1;
 
 // Cache for model lookups to avoid repeated searching
 let modelLookupCache = new Map<string, any>();
+let partGroupMap = new Map<string, string>();
 
 // collect all parts (to match file paths with color/opacity)
 const allParts = computed<IModel[]>(() => {
   const p: IModel[] = [];
-  
+
   const collectSrcs = (items: any[]) => {
     (items || []).forEach((item: any) => {
       if (item.src) {
@@ -91,50 +98,64 @@ const allParts = computed<IModel[]>(() => {
       }
     });
   };
-  
-  (props.models as ICascadeCategory[]).forEach((group) => {
-    collectSrcs(group.children || []);
-  });
-  
+
+  collectSrcs(props.models as any[]);
+
   return p;
 });
 
-// build cascader options (2 levels: group → part)
 const cascadeOptions = computed(() => {
   modelLookupCache.clear();
-  
-  const options = (props.models as ICascadeCategory[]).map(group => {
-    modelLookupCache.set(group.key, group);
-    return {
-      label: group.label,
-      value: group.key,
-      children: (group.children || []).map((part: any) => {
-        modelLookupCache.set(part.key, part);
-        return { label: part.label, value: part.key }
-      })
+  partGroupMap.clear();
+
+  // Only one level of children shown; versions (leaf nodes with src) appear via radio buttons, not cascader
+  const options: CascaderOption[] = (props.models as ICascadeCategory[]).map(top => {
+    modelLookupCache.set(top.key, top);
+    const hasChildren = top.children && top.children.length > 0;
+    if (!hasChildren) {
+      return { label: top.label, value: top.key };
     }
+
+    // If all children have src -> these are versions; treat top-level as direct selectable
+    const childrenAreVersions = top.children!.every((c: any) => !!c.src);
+    if (childrenAreVersions) {
+      return { label: top.label, value: top.key };
+    }
+
+    // Otherwise children are parts/categories; include them one level deep
+    const childOpts = top.children!.map((child: any) => {
+      modelLookupCache.set(child.key, child);
+      partGroupMap.set(child.key, top.key);
+      return { label: child.label, value: child.key } as CascaderOption;
+    });
+    return { label: top.label, value: top.key, children: childOpts };
   });
   return options;
 });
 
 const versionData = computed(() => {
   const none = { versionOptions: [], isGroup: false, children: [], filePaths: [] };
-  if (!selectedPath.value || selectedPath.value.length < 2) {
+  if (!selectedPath.value || selectedPath.value.length < 1) {
     return none;
   }
 
-  const [groupKey, partKey] = selectedPath.value;
-  const group = modelLookupCache.get(groupKey);
-  if (!group || !group.children) {
+  const itemKey = selectedPath.value[selectedPath.value.length - 1];
+  const item = modelLookupCache.get(itemKey);
+  if (!item) {
     return none;
   }
 
-  const part = group.children.find((p: any) => p.key === partKey);
-  if (!part || !part.children) {
-    return none;
+  // Leaf item without versions: load directly
+  if (!item.children || item.children.length === 0) {
+    return {
+      versionOptions: [],
+      isGroup: false,
+      children: [],
+      filePaths: item.src ? [item.src] : []
+    };
   }
 
-  const versionOptions = (part.children as any[]).map((v: any) => {
+  const versionOptions = (item.children as any[]).map((v: any) => {
     const isGroup = !!(v as any).children && (v as any).children.length > 0;
     const value = (v as any).isGroup || isGroup ? (v.key || v.src) : (v.src || v.key);
     return {
@@ -181,68 +202,80 @@ const filePaths = computed(() => versionData.value.filePaths);
 // Initialize default selection when models are ready
 watch(() => props.models, () => {
   if (selectedPath.value) return;
-  
+
   const models = props.models as ICascadeCategory[];
   if (!models || models.length === 0) return;
-  
+
   // trigger cascadeOptions computation to populate cache
   void cascadeOptions.value;
-  
-  const firstCat = models[0];
-  const firstChild = firstCat.children && firstCat.children[0];
-  if (firstCat && firstChild) {
-    selectedPath.value = [firstCat.key, (firstChild as any).key];
-    cascaderValue.value = (firstChild as any).key;
+
+  for (const item of models) {
+    if (item.children && item.children.length > 0) {
+      const firstChild = item.children[0];
+      if (firstChild) {
+        selectedPath.value = [item.key, firstChild.key];
+        cascaderValue.value = firstChild.key;
+        return;
+      }
+    } else if (item.src) {
+      selectedPath.value = [item.key];
+      cascaderValue.value = item.key;
+      return;
+    }
   }
 }, { immediate: true });
 
-// When cascader changes, convert leaf value back to full [group, part] path
+// When cascader changes, convert selected value back to full path
 watch(cascaderValue, (leafValue) => {
   if (!leafValue) {
     selectedPath.value = null;
     return;
   }
 
-  // leafValue is the part key; find which group it belongs to
-  const partKey = Array.isArray(leafValue) ? leafValue[0] : leafValue;
-  
-  // Search for the group that contains this part
-  for (const group of props.models as ICascadeCategory[]) {
-    if (group.children && group.children.find((p: any) => p.key === partKey)) {
-      selectedPath.value = [group.key, partKey];
-      return;
-    }
+  const valueKey = Array.isArray(leafValue) ? leafValue[leafValue.length - 1] : leafValue;
+  const path: string[] = [];
+  let current: string | undefined = valueKey;
+  const visited = new Set<string>();
+
+  while (current && !visited.has(current)) {
+    path.unshift(current);
+    visited.add(current);
+    current = partGroupMap.get(current);
   }
+
+  if (path.length === 0) {
+    path.push(valueKey);
+  }
+
+  selectedPath.value = path;
 });
 
-// when the cascader path changes, default the version selection
+// when the cascader path changes, default the version selection to the last
 watch(selectedPath, (path) => {
-  if (!path || path.length < 2) return;
-  
-  // Use versionData directly to get the versions
-  const [groupKey, partKey] = path;
-  const group = modelLookupCache.get(groupKey);
-  if (!group || !group.children) {
+  if (!path || path.length < 1) return;
+
+  const itemKey = path[path.length - 1];
+  const item = modelLookupCache.get(itemKey);
+
+  if (!item) {
     selectedVersionSrc.value = null;
     visibleParts.value = [];
     loadModel();
     return;
   }
 
-  const part = group.children.find((p: any) => p.key === partKey);
-  if (!part || !part.children || part.children.length === 0) {
-    selectedVersionSrc.value = null;
+  if (!item.children || item.children.length === 0) {
+    selectedVersionSrc.value = item.src || null;
     visibleParts.value = [];
     loadModel();
     return;
   }
 
-  // Select the last version by default
-  const versions = part.children as any[];
+  const versions = item.children as any[];
   const last = versions[versions.length - 1];
   const isGroup = !!(last.children && last.children.length > 0);
   const value = isGroup ? (last.key || last.src) : (last.src || last.key);
-  
+
   selectedVersionSrc.value = value;
   if (isGroup && last.children) {
     visibleParts.value = (last.children as any[]).map((c: any) => c.src);
@@ -254,25 +287,19 @@ watch(selectedPath, (path) => {
 
 // when a version is selected in cascade mode, update visibleParts
 watch(selectedVersionSrc, (val) => {
-  if (!val || !selectedPath.value || selectedPath.value.length < 2) {
-    loadModel();
-    return;
-  }
-  
-  const [groupKey, partKey] = selectedPath.value;
-  const group = modelLookupCache.get(groupKey);
-  if (!group || !group.children) {
+  if (!val || !selectedPath.value || selectedPath.value.length < 1) {
     loadModel();
     return;
   }
 
-  const part = group.children.find((p: any) => p.key === partKey);
-  if (!part || !part.children) {
+  const itemKey = selectedPath.value[selectedPath.value.length - 1];
+  const item = modelLookupCache.get(itemKey);
+  if (!item || !item.children) {
     loadModel();
     return;
   }
 
-  const versionObj = part.children.find((v: any) => {
+  const versionObj = item.children.find((v: any) => {
     const isGroup = !!(v.children && v.children.length > 0);
     const value = isGroup ? (v.key || v.src) : (v.src || v.key);
     return value === val;
@@ -355,6 +382,9 @@ function initThree() {
 }
 
 async function loadModel() {
+  if (!scene) {
+    return;
+  }
   if (!filePaths.value.length) return;
 
   const cascaderChanged = JSON.stringify(previousSelectedPath.value) !== JSON.stringify(selectedPath.value);
@@ -362,7 +392,7 @@ async function loadModel() {
 
   const isNewModule = selectedVersionSrc.value !== currentModuleName;
 
-  if (currentGroup) scene.remove(currentGroup);
+  if (currentGroup && scene) scene.remove(currentGroup);
   currentGroup = new THREE.Group();
 
   const meshes: THREE.Mesh[] = [];
@@ -443,10 +473,15 @@ function loadVRML(path: string): Promise<THREE.Scene> {
 function createMeshWithMaterial(geometry: THREE.BufferGeometry, path: string) {
   geometry.computeVertexNormals();
 
-  const fileKey = path.toLowerCase().split("/").pop()!;
-  const part = allParts.value.find((p) =>
-    fileKey.includes(p.src.split("/").pop()!.toLowerCase())
-  );
+  const pathLower = path.toLowerCase();
+  let part = allParts.value.find((p) => p.src.toLowerCase() === pathLower);
+  if (!part) {
+    const fileKey = pathLower.split("/").pop()!;
+    part = allParts.value.find((p) => {
+      const srcFile = p.src.split("/").pop()?.toLowerCase();
+      return srcFile === fileKey;
+    });
+  }
 
   const colorHex = part?.colorHex ?? "0xffffff";
   const opacity = part?.opacity ?? 1;
