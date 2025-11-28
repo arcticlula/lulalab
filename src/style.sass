@@ -4,9 +4,17 @@
   text-rendering: optimizeLegibility
   -webkit-font-smoothing: antialiased
   -moz-osx-font-smoothing: grayscale
+  --background-color: #101014
+  --title: rgba(255, 255, 255, 0.9)
+  --semi-title: #ff9f5a
+  --theme-button: #63e2b7
+  --semi-title-decoration: green wavy underline
 
-html
-  scrollbar-gutter: stable
+// // Apply heading color via CSS variable (Naive UI headings use .n-h1 ... .n-h6)
+// .n-h1, .n-h2, .n-h3, .n-h4, .n-h5, .n-h6
+//   color: var(--semi-title)
+// html, body
+//   scrollbar-gutter: stable
 
 .squid-text
   color: #cecece
@@ -17,10 +25,14 @@ html
 .squid-description
   color: #1ba59f
 
-.squid-semi-title
-  color: #ff9f5a
+.squid-title
+  color: var(--title)
   font-weight: bold
-  text-decoration: green wavy underline
+
+.squid-semi-title
+  color: var(--semi-title)
+  font-weight: bold
+  text-decoration: var(--semi-title-decoration)
 
 .squid-highlight
   color: wheat

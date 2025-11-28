@@ -1,90 +1,44 @@
 <template>
-  <div class="project-view">
-    <n-h1>Simple Monophonic FM </n-h1>
-    <n-p><strong>June 2013</strong></n-p>
-    <n-blockquote>
-      A simple, battery-powered monophonic FM transmitter built "deadbug-style" 
-      with discrete components, designed to broadcast audio from a device like a 
-      mp3 player to any standard FM radio receiver.
-    </n-blockquote>
-    <div class="carousel-wrapper">
-      <Carousel :images="images" />
-    </div>
-    <n-p><strong>The Story</strong></n-p>
+  <ProjectTemplate id="wtf">
+    <n-p class="squid-semi-title">The Story</n-p>
     <n-p>
-      One of my earlier projects was this simple FM transmitter, built
-      "deadbug-style" based on a popular online schematic. The frequency can be
-      finely tuned with a variable capacitor, though finding the base
-      frequency the first time was a challenge. The entire circuit, which runs
-      off a 9V battery, is housed in a metal cigar box. Audio input is handled
-      through a 6.3mm to 3.5mm jack adapter, making it easy to plug in almost
-      any device. My favorite use was connecting a guitar and “playing”
-      directly through a nearby radio.
+      A handmade fuzz/distortion guitar pedal built from scratch on perfboard and housed in a custom 1590B enclosure.
+      It includes two potentiometers (volume and gain) and two toggle switches to select different diode clipping types,
+      ranging from smooth germanium fuzz to aggressive LED/silicon distortion. It features a 3PDT footswitch for true bypass,
+      and auto power via the 6.3 mm input jack contact.
     </n-p>
-    <n-p><strong>Key Features</strong></n-p>
+    <n-p class="squid-semi-title">Key Features</n-p>
     <n-ul>
-      <n-li>Broadcasts monophonic audio over the standard FM band.</n-li>
-      <n-li>Fine frequency tuning via a variable capacitor.</n-li>
-      <n-li>Hand-wound inductor coil.</n-li>
-      <n-li>6.3mm audio input.</n-li>
-      <n-li>Portable, self-contained unit powered by a 9V battery.</n-li>
+      <n-li>Fuzz/Distortion effect pedal built on perfboard.</n-li>
+      <n-li>Custom 1590B enclosure.</n-li>
+      <n-li>Volume and gain controls.</n-li>
+      <n-li>Switchable diode clipping: germanium, LED, silicon.</n-li>
+      <n-li>3PDT true bypass.</n-li>
+      <n-li>Auto power via input jack.</n-li>
+      <n-li>9V powered.</n-li>
     </n-ul>
-    <n-p><strong>Tech Stack</strong></n-p>
+    <n-p class="squid-semi-title">Tech Stack</n-p>
     <n-ul>
-      <n-li><strong>Style:</strong> Deadbug-style point-to-point soldering</n-li>
-      <n-li><strong>Components:</strong> Discrete transistors, resistors, capacitors (including a variable capacitor), hand-wound inductor.</n-li>
-      <n-li><strong>Power:</strong> 9V battery</n-li>
+      <n-li>Analog electronics: diodes, resistors, capacitors, perfboard layout.</n-li>
+      <n-li>Mechanical: 1590B enclosure, drilling and hardware mounting.</n-li>
     </n-ul>
-    <n-p><strong>Challenges & Lessons Learned</strong></n-p>
+    <n-p class="squid-semi-title">Challenges & Lessons Learned</n-p>
     <n-p>
-      The biggest lesson from this project was in RF (Radio Frequency) design,
-      specifically regarding enclosure materials. Housing the circuit in a
-      metal cigar box created a Faraday cage effect, which significantly
-      interfered with the signal strength. The transmitter only worked
-      properly with the lid open, teaching me a valuable, practical lesson
-      about how enclosure choices can impact antenna performance and signal
-      propagation.
+      Tuning the clipping combinations to get musically useful ranges required experimentation. The enclosure machining had to be precise
+      to align pots, switches, and jacks. True bypass wiring and jack-based power switching made the pedal practical for real use.
     </n-p>
-    <n-p><strong>Links</strong></n-p>
-    <n-p>
-        <n-a href="https://anarchy.translocal.jp/radio/micro/howtosimplestTX.html" target="_blank">
-            Original Schematic/Design 
-        </n-a>
-        - glad to see the original link still works!
-    </n-p>
-  </div>
+    <n-p class="squid-semi-title">Links</n-p>
+    <n-ul>
+      
+    </n-ul>
+  </ProjectTemplate>
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue';
-
-  const images = ref<string[]>([
-    'https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel1.jpeg',
-    'https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel2.jpeg',
-    'https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel3.jpeg',
-    'https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel4.jpeg',
-  ]);
+import ProjectTemplate from '../../components/ProjectTemplate.vue';
 
 
 </script>
 
 <style scoped lang="sass">
-.project-view
-  padding: 0 32px
-  text-align: justify
-  hyphens: auto
-  .n-h1
-    margin-bottom: 0
-  .n-card
-    margin-top: 24px
-
-.carousel-wrapper
-  display: flex
-  justify-content: center
-  margin: 24px 0
-
-@media (max-width: 800px)
-  .project-view
-    padding: 0 4px !important
-
 </style>

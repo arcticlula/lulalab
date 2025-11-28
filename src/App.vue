@@ -1,100 +1,56 @@
 <template>
-  <n-config-provider
-    :theme="darkTheme"
-    :theme-overrides="themeOverrides"
-    class="app-container"
-    @mousemove="handleMouseMove"
-  >
+  <n-config-provider :theme="darkTheme" :theme-overrides="themeOverrides" class="app-container">
     <n-global-style />
-
-    <div
-      class="background-layer"
-      :style="dynamicBackgroundStyle"
-    />
-
     <div class="content-wrapper">
-      <n-flex class="header" justify="center">
-        <router-link to="/"><n-button text>Home</n-button></router-link> |
-        <router-link to="/projects"><n-button text>Projectos</n-button></router-link> |
-        <router-link to="/cv"><n-button text>CV</n-button></router-link> |
-        <router-link to="/about"><n-button text>Acerca</n-button></router-link>
+      <n-flex justify="center">        
+        <n-flex class="header" justify="center">
+          <router-link to="/"><n-button text>Home</n-button></router-link> |
+          <router-link to="/projects"><n-button text>Projects</n-button></router-link> |
+          <router-link to="/cv"><n-button text>CV</n-button></router-link> |
+          <router-link to="/about"><n-button text>About</n-button></router-link>
+        </n-flex>
+
+        <n-icon v-if="!userIsSkiparoo" class="theme-button" @click="openModal">
+            <ColorSwitch />
+        </n-icon>
       </n-flex>
       <div class="body">
         <router-view />
       </div>
     </div>
+
+    <ColorPickerModal :theme-overrides="themeOverrides" @update:theme-overrides="themeOverrides = $event" @skiparoo="handleSkiparoo" ref="colorPickerRef"/>
   </n-config-provider>
 </template>
 
 <script setup lang="ts">
 import { darkTheme, GlobalThemeOverrides } from 'naive-ui'
-import { ref, computed, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref } from 'vue'
+import { ColorSwitch } from '@vicons/carbon';
 
-const themeOverrides: GlobalThemeOverrides = {
+import { defaultOverrides } from './themes/custom'
+import ColorPickerModal from './components/ColorPickerModal.vue'
+
+const themeOverrides = ref<GlobalThemeOverrides>({
+  ...defaultOverrides,
   common: {
+    ...defaultOverrides.common,
     lineHeight: '1.3',
-    fontFamily: "monospace",
+    fontFamily: 'monospace',
+    bodyColor: '#101014',
   },
-}
-
-const mouseX = ref(0)
-const mouseY = ref(0)
-const route = useRoute()
-
-function handleMouseMove(event: MouseEvent) {
-  mouseX.value = event.clientX
-  mouseY.value = event.clientY
-}
-
-const cvBackground = 'linear-gradient(to right, rgba(255,198,194,0.4), rgba(195,224,221,0.4), rgba(250,233,218,0.4))'
-const crosshatchBackground = `
-  repeating-linear-gradient(22.5deg, transparent, transparent 2px, rgba(16, 185, 129, 0.18) 2px, rgba(16, 185, 129, 0.18) 3px, transparent 3px, transparent 8px),
-  repeating-linear-gradient(67.5deg, transparent, transparent 2px, rgba(245, 101, 101, 0.10) 2px, rgba(245, 101, 101, 0.10) 3px, transparent 3px, transparent 8px),
-  repeating-linear-gradient(112.5deg, transparent, transparent 2px, rgba(234, 179, 8, 0.08) 2px, rgba(234, 179, 8, 0.08) 3px, transparent 3px, transparent 8px),
-  repeating-linear-gradient(157.5deg, transparent, transparent 2px, rgba(249, 115, 22, 0.06) 2px, rgba(249, 115, 22, 0.06) 3px, transparent 3px, transparent 8px)
-`
-
-const backgroundDefinitions = {
-  cv: () => ({
-    backgroundImage: cvBackground,
-    backgroundColor: 'black',
-    backgroundSize: 'auto',
-    backgroundPosition: '0 0',
-    transition: 'none',
-  }),
-  
-  crosshatch: (x: number, y: number) => {
-    const pos1 = `${x / -20}px ${y / 30}px`;
-    const pos2 = `${x / 15}px ${y / -25}px`;
-    const pos3 = `${x / -10}px ${y / 15}px`;
-    const pos4 = `${x / 25}px ${y / -10}px`;
-    return {
-      backgroundImage: crosshatchBackground,
-      backgroundColor: 'black',
-      backgroundSize: 'auto',
-      backgroundPosition: `${pos1}, ${pos2}, ${pos3}, ${pos4}`,
-      transition: 'background-position 0.1s ease-out',
-    }
-  },
-
-  black: () => ({
-    backgroundColor: 'black',
-    transition: 'none',
-  }),
-}
-
-const defaultBackgroundKey: keyof typeof backgroundDefinitions = 'crosshatch';
-
-const dynamicBackgroundStyle = computed(() => {
-  const bgKey = (route.meta.background as keyof typeof backgroundDefinitions) || defaultBackgroundKey;
-  const styleFn = backgroundDefinitions[bgKey] || backgroundDefinitions[defaultBackgroundKey];
-  return styleFn(mouseX.value, mouseY.value);
 })
 
-watch(() => route.name, () => {
-    document.body.style.background = 'black';
-}, { immediate: true })
+const colorPickerRef = ref<InstanceType<typeof ColorPickerModal>>()
+const userIsSkiparoo = ref(false);
+
+function openModal() {
+  colorPickerRef.value?.openModal()
+}
+
+function handleSkiparoo() {
+  userIsSkiparoo.value = true;
+}
 </script>
 
 <style scoped lang="sass">
@@ -123,6 +79,14 @@ watch(() => route.name, () => {
   > *
     margin: 0 16px
 
+.theme-button
+  color: var(--theme-button)
+  align-self: center
+  margin-top: 1px
+  :hover
+    cursor: pointer
+    color: var(--theme-button)
+
 @media (max-width: 800px)
   .body
     margin: 8px 16px
@@ -131,4 +95,10 @@ watch(() => route.name, () => {
     > *
       margin: 0 12px
 
+  // .content-wrapper
+  //   display: flex
+  // .theme
+  //   position: relative
+  //   top: 8px
+  //   right: 8px
 </style>

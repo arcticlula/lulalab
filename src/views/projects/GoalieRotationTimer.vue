@@ -1,85 +1,69 @@
 <template>
-  <div class="project-view">
-    <n-h1>Simple Monophonic FM Transmitter</n-h1>
-    <n-p><strong>June 2013</strong></n-p>
-    <n-blockquote>
-      A simple, battery-powered monophonic FM transmitter built "deadbug-style" 
-      with discrete components, designed to broadcast audio from a device like a 
-      mp3 player to any standard FM radio receiver.
-    </n-blockquote>
-    <div class="carousel-wrapper">
-      <Carousel :images="images" />
-    </div>
-    <n-p><strong>The Story</strong></n-p>
+  <ProjectTemplate id="goalie-rotation-timer" :media="media" :models="models">
+    <n-p class="squid-semi-title">The Story</n-p>
     <n-p>
-      One of my earlier projects was this simple FM transmitter, built
-      "deadbug-style" based on a popular online schematic. The frequency can be
-      finely tuned with a variable capacitor, though finding the base
-      frequency the first time was a challenge. The entire circuit, which runs
-      off a 9V battery, is housed in a metal cigar box. Audio input is handled
-      through a 6.3mm to 3.5mm jack adapter, making it easy to plug in almost
-      any device. My favorite use was connecting a guitar and “playing”
-      directly through a nearby radio.
+      This project started as a dedicated device to manage goalie rotations during our soccer games, where everyone had to play as a keeper. 
+      The idea was simple: track a set time interval for each player and sound a buzzer when it was time to switch. I built two prototypes, 
+      the first was a modular build centered around a battery, with an ESP32 + a small display, and a charging board on different sides. 
+      The second version moved to a custom PCB I designed, keeping the same core functionality but still in a prototype format.
     </n-p>
-    <n-p><strong>Key Features</strong></n-p>
+    <n-p>
+      Although the project was eventually scrapped, many of its ideas carried over into <router-link :to="{ name: 'netscore' }"><n-a>NetScore</n-a></router-link>, which now handles score tracking through BLE button inputs. 
+      The keeper-switching logic might make a comeback there someday — though lately I've been playing more volleyball than football.    
+    </n-p>
+    <n-p class="squid-semi-title">Key Features</n-p>
     <n-ul>
-      <n-li>Broadcasts monophonic audio over the standard FM band.</n-li>
-      <n-li>Fine frequency tuning via a variable capacitor.</n-li>
-      <n-li>Hand-wound inductor coil.</n-li>
-      <n-li>6.3mm audio input.</n-li>
-      <n-li>Portable, self-contained unit powered by a 9V battery.</n-li>
+      <n-li>Interval Timing: <span class="squid-text-alt"> and provides alerts for substitutions.</span></n-li>
+      <n-li>Visual Feedback: <span class="squid-text-alt">Readable display shows remaining time and rotation count.</span></n-li>
+      <n-li>Audible Alerts: <span class="squid-text-alt">Buzzer cue signals when it’s time to swap goalies.</span></n-li>
+      <n-li>Portable Enclosure: <span class="squid-text-alt">Lightweight, battery-powered prototype for field use.</span></n-li>
+      <n-li>Microcontroller Based: <span class="squid-text-alt">ESP32 for timing, IO, and future connectivity ideas.</span></n-li>
     </n-ul>
-    <n-p><strong>Tech Stack</strong></n-p>
+    <n-p class="squid-semi-title">Tech Stack</n-p>
     <n-ul>
-      <n-li><strong>Style:</strong> Deadbug-style point-to-point soldering</n-li>
-      <n-li><strong>Components:</strong> Discrete transistors, resistors, capacitors (including a variable capacitor), hand-wound inductor.</n-li>
-      <n-li><strong>Power:</strong> 9V battery</n-li>
+      <n-li>Microcontroller: <span class="squid-text-alt">ESP32 module.</span></n-li>
+      <n-li>Display: <span class="squid-text-alt">Simple numeric / segmented display (prototype stage).</span></n-li>
+      <n-li>Alert Hardware: <span class="squid-text-alt">Piezo / passive buzzer for interval signals.</span></n-li>
+      <n-li>Power: <span class="squid-text-alt">Battery powered for portability.</span></n-li>
+      <n-li>Circuit Board Technique: <span class="squid-text-alt">Perfboard with pre-made modules. PCB for v2</span></n-li>
     </n-ul>
-    <n-p><strong>Challenges & Lessons Learned</strong></n-p>
+    <n-p class="squid-semi-title">Challenges & Lessons Learned</n-p>
     <n-p>
-      The biggest lesson from this project was in RF (Radio Frequency) design,
-      specifically regarding enclosure materials. Housing the circuit in a
-      metal cigar box created a Faraday cage effect, which significantly
-      interfered with the signal strength. The transmitter only worked
-      properly with the lid open, teaching me a valuable, practical lesson
-      about how enclosure choices can impact antenna performance and signal
-      propagation.
+      Designing timing logic that remained clear under outdoor conditions highlighted how important human factors are: brightness, contrast, and sound levels mattered more than microcontroller details. The enclosure evolved to improve viewing angles. I also experimented with different alert durations so players noticed the change without feeling annoyed. Future iterations would explore wireless sync or a start/pause interface.
     </n-p>
-    <n-p><strong>Links</strong></n-p>
-    <n-p>
-        <n-a href="https://anarchy.translocal.jp/radio/micro/howtosimplestTX.html" target="_blank">
-            Original Schematic/Design 
-        </n-a>
-        - glad to see the original link still works!
-    </n-p>
-  </div>
+    <n-p class="squid-semi-title">Links</n-p>
+    <n-ul>
+      <n-li><n-a href="toDo" target="_blank">[GitHub Repository]</n-a></n-li>
+    </n-ul>
+  </ProjectTemplate>
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue';
+import { ref } from 'vue';
+import ProjectTemplate from '../../components/ProjectTemplate.vue';
+import { IMedia, ICascadeCategory } from '../../models/media';
 
-  const images = ref<string[]>([
-    'https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel1.jpeg',
-    'https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel2.jpeg',
-    'https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel3.jpeg',
-    'https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel4.jpeg',
-  ]);
+const media = ref<IMedia[]>([
+  { type: 'image', src: 'goalie-rotation-timer/images/PXL_20231219_231824476.jpg', description: 'some breadboard prototyping before freestyling a build' },
+  { type: 'image', src: 'goalie-rotation-timer/images/PXL_20231227_210425440.jpg', description: 'esp32 on the bottom, battery charging module on the side and protoboard above' },
+  { type: 'image', src: 'goalie-rotation-timer/images/side.jpg', description: 'buttons + battery level circuit (mosfet is toggled by gpio and voltage divider value is read by the ADC)' },
+  { type: 'image', src: 'goalie-rotation-timer/images/body.jpg', description: 'it was a (very) tight fit' },
+  { type: 'video', src: 'goalie-rotation-timer/videos/views.mp4', description: 'some different angles' },
+  { type: 'image', src: 'goalie-rotation-timer/images/buzzer.jpg', description: 'buzzer with it\'s driving circuit' },
+  { type: 'image', src: 'goalie-rotation-timer/images/PXL_20231230_231417769.jpg', description: 'the full 0.42 inch display in it\'s glory - also final modifications before closing the bottom' },
+  { type: 'image', src: 'goalie-rotation-timer/images/side_final.jpg', description: 'side view after fitting everything inside' },
+  { type: 'image', src: 'goalie-rotation-timer/images/PXL_20231231_025358687.jpg', description: '' },
+  { type: 'video', src: 'goalie-rotation-timer/videos/PXL_20240112_004200338.mp4', description: '' },
+  { type: 'video', src: 'goalie-rotation-timer/videos/PXL_20240507_202517352.mp4', description: 'the old blink test in the test pcb - you can see some fixes were needed' },
+  { type: 'image', src: 'goalie-rotation-timer/images/PXL_20240525_172958691.jpg', description: '' },
+  { type: 'video', src: 'goalie-rotation-timer/videos/PXL_20240112_004035904.mp4', description: 'glitch in the matrix' },
+]);
 
+const models = ref<ICascadeCategory[]>([
+  { key: 'grt-pcb-v1', label: 'PCB v1.0', src: 'goalie-rotation-timer/models/pcb/Goalie-Rotation-Timer-v1.0.wrl' },
+  { key: 'grt-pcb-v2', label: 'PCB v2.0', src: 'goalie-rotation-timer/models/pcb/Goalie-Rotation-Timer-v2.0.wrl' },
+]);
 </script>
 
 <style scoped lang="sass">
-.project-view
-  padding: 0 32px
-  text-align: justify
-  hyphens: auto
-  .n-h1
-    margin-bottom: 0
-  .n-card
-    margin-top: 24px
-
-.carousel-wrapper
-  display: flex
-  justify-content: center
-  margin: 24px 0
-
 </style>

@@ -32,7 +32,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: 'wtf',
-        name: 'what-the-fuzz',
+        name: 'wtf',
         component: () => import("../views/projects/WTF.vue"),
         meta: { background: 'black' }
       },
@@ -94,6 +94,24 @@ const routes: Array<RouteRecordRaw> = [
         path: 'ian',
         name: 'ian',
         component: () => import("../views/projects/Ian.vue"),
+        meta: { background: 'black' }
+      },
+      {
+        path: 'bat-charger',
+        name: 'bat-charger',
+        component: () => import("../views/projects/BatCharger.vue"),
+        meta: { background: 'black' }
+      },
+      {
+        path: 'better-courts',
+        name: 'better-courts',
+        component: () => import("../views/projects/BetterCourts.vue"),
+        meta: { background: 'black' }
+      },
+      {
+        path: 'to-do',
+        name: 'toDo',
+        component: () => import("../views/projects/toDo.vue"),
         meta: { background: 'black' }
       }
     ],

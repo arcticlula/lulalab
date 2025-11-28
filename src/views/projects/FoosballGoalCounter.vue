@@ -1,206 +1,159 @@
 <template>
-  <div class="project-view">
-    <n-h1>Mood Light</n-h1>
-    <n-p><strong>September 2025</strong></n-p>
-    <n-blockquote>
-      A diffused ambient light built from repurposed materials, controlled directly from any modern web browser using the Web Bluetooth API.
-    </n-blockquote>
-    <div class="carousel-wrapper">
-      <MediaCarousel :media="media" />
-    </div>
-    <n-p><strong>The Story</strong></n-p>
+  <ProjectTemplate id="foosball-goal-counter" :media="media" :models="models">
+    <n-p class="squid-semi-title">The Story</n-p>
     <n-p>
-      This project was born from a happy accident. I had some leftover WS2811 LED strips and a few plexiglass samples that I had mistakenly ordered for the NetScore project - 
-      I thought they would be clear, but they arrived translucent. This mistake, however, turned out to be a pretty good material for a light diffuser.
-      I designed a simple enclosure in Onshape, consisting of a 3D-printed frame that wraps around the plexiglass panel, with the LED strip running along the inner perimeter. 
-      The result is a soft, uniform glow that fills the room - dependant on the acrylic used. 
-      The light is powered by a 12V transformer and an ESP32-C3, the LEDs are controlled wirelessly via a web app using the Web Bluetooth API, 
-      allowing you to connect and change colors on the fly from a browser.
+      This prototype was built to automatically record foosball goals without human input. The idea: guide the ball over a sensing "bridge" after each goal using a low-friction ramp, detect passage, then update and display the score in real time. I iterated through multiple mechanical versions to get reliable ball travel and sensor triggering while keeping the structure compact and printable.
     </n-p>
-    <n-p><strong>Key Features</strong></n-p>
+    <n-p class="squid-semi-title">Key Features</n-p>
     <n-ul>
-      <n-li><strong>Soft, Diffused Lighting:</strong> Uses a WS2811 LED strip paired with a translucent plexiglass panel for a smooth, ambient glow.</n-li>
-      <n-li><strong>Custom Enclosure:</strong> The frame was parametrically designed in Onshape and 3D-printed.</n-li>
-      <n-li><strong>Browser-Based Control:</strong> Wirelessly change colors and patterns using the Web Bluetooth API - no native app required.</n-li>
-      <n-li><strong>Repurposed Components:</strong> Built from leftover materials from previous projects.</n-li>
+      <n-li>Automated Detection: <span class="squid-text-alt">Ramp + bridge assembly channels the ball through a sensor region after every goal.</span></n-li>
+      <n-li>Real-Time Scoring: <span class="squid-text-alt">Microcontroller logic updates and persists scores instantly.</span></n-li>
+      <n-li>Modular Printed Parts: <span class="squid-text-alt">Separate ramp, case, and bridge components iterated across versions.</span></n-li>
+      <n-li>Compact Electronics Bay: <span class="squid-text-alt">Internal area for controller and wiring.</span></n-li>
+      <n-li>Progressive Mechanical Refinement: <span class="squid-text-alt">Multiple geometry tweaks for ball guidance consistency.</span></n-li>
     </n-ul>
-    <n-p><strong>Tech Stack</strong></n-p>
+    <n-p class="squid-semi-title">Tech Stack</n-p>
     <n-ul>
-      <n-li><strong>Hardware:</strong> ESP32-C3, WS2811 individually addressable LED strip, Translucent Plexiglass.</n-li>
-      <n-li><strong>Control Protocol:</strong> Web Bluetooth API.</n-li>
-      <n-li><strong>3D Design:</strong> Onshape.</n-li>
-      <n-li><strong>Fabrication:</strong> 3D Printing.</n-li>
+      <n-li>Mechanical: <span class="squid-text-alt">Custom 3D printed ramp, bridge, and enclosure parts.</span></n-li>
+      <n-li>Electronics: <span class="squid-text-alt">Microcontroller + discrete sensing (future IR / hall expansion).</span></n-li>
+      <n-li>Fabrication: <span class="squid-text-alt">FDM 3D printing with iterative CAD changes.</span></n-li>
+      <n-li>Interface: <span class="squid-text-alt">Intended web/app display (prototype stage).</span></n-li>
     </n-ul>
-    <n-p><strong>Challenges & Lessons Learned</strong></n-p>
+    <n-p class="squid-semi-title">Challenges & Lessons Learned</n-p>
     <n-p>
-      The primary lesson from this project was the value of creative repurposing and "happy accidents." 
-      The translucent plexiglass, initially a purchasing mistake for another project, became the key component that defined the aesthetic of this one. 
-      It’s a great reminder that sometimes the best designs come from adapting to unexpected materials and finding new potential in leftovers. 
-      The project is also a great exploration of the power of Web Bluetooth for creating seamless hardware interactions without needing to develop a dedicated mobile application.
+      Achieving consistent ball travel required tuning surface angle, wall clearances, and entry alignment. Small geometry changes (like lip height or ramp curvature) had large effects on whether the ball would stall. Future improvements would integrate fully enclosed sensing and wireless score broadcast. Mechanical repeatability matters just as much as electronics for reliability.
     </n-p>
-    <n-p><strong>Links</strong></n-p>
-    <n-p>
-
-    </n-p>
-    <n-p><strong>3D Model Viewer</strong></n-p>
-    <div>
-      <!-- <STLViewer :models="models" /> -->
-    </div>
-  </div>
+    <n-p class="squid-semi-title">Links</n-p>
+    <n-ul>
+      <n-li><n-a href="toDo" target="_blank">[GitHub Repository]</n-a></n-li>
+    </n-ul>
+  </ProjectTemplate>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import MediaCarousel from '../../components/MediaCarousel.vue';
-// import STLViewer from '../../components/STLViewer.vue';
-import { IMedia } from '../../models/media';
+import ProjectTemplate from '../../components/ProjectTemplate.vue';
+import { IMedia, ICascadeCategory } from '../../models/media';
 
 const media = ref<IMedia[]>([
-  {
-    type: 'video',
-    src: 'plant-sniffer/videos/PXL_20230904_143511372.mp4',
-  },
-
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230830_235156568.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230830_235208335.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230831_164257589.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230831_174424917.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230831_174438762.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230831_174952820.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230831_190110418.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230831_190326297.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230831_190332076.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230901_191630490.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230901_191642741.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230901_191710199.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230901_195810073.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230901_195818712.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230902_202053748.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230904_134746450.jpg' },
-  { type: 'image', src: 'plant-sniffer/images/PXL_20230904_134752273.jpg' }
+  { type: 'video', src: 'foosball-goal-counter/videos/PXL_20230815_223158959.mp4', description: 'goal detection ramp test' },
+  { type: 'video', src: 'foosball-goal-counter/videos/PXL_20230821_214233713.mp4', description: 'bridge sensor activation sequence' },
+  { type: 'image', src: 'foosball-goal-counter/images/PXL_20230815_205930926.jpg', description: 'enclosure and ramp iteration' },
+  { type: 'image', src: 'foosball-goal-counter/images/PXL_20230816_195004995.jpg', description: 'internal wiring layout' },
+  { type: 'image', src: 'foosball-goal-counter/images/PXL_20230821_213421130.jpg', description: 'bridge component closeup' },
 ]);
 
-// const models = ref<IObjectMedia[]>([
-//   {
-//     name: 'Bottom Case',
-//     obj: [
-//       {
-//         name: 'v1.0',
-//         src: 'foosball-goal-counter/models/matrecos-case-bottom-v1.0.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v1.1',
-//         src: 'foosball-goal-counter/models/matrecos-case-bottom-v1.1.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v1.2',
-//         src: 'foosball-goal-counter/models/matrecos-case-bottom-v1.2.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v2.0',
-//         src: 'foosball-goal-counter/models/matrecos-case-bottom-v2.0.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v2.1',
-//         src: 'foosball-goal-counter/models/matrecos-case-bottom-v2.1.stl',
-//         colorHex: '0xff7f00'
-//       }
-//     ]
-//   },
-//   {
-//     name: 'Top Case',
-//     obj: [
-//       {
-//         name: 'v0.1',
-//         src: 'foosball-goal-counter/models/matrecos-case-top-v0.1.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v1.0',
-//         src: 'foosball-goal-counter/models/matrecos-case-top-v1.0.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v1.1',
-//         src: 'foosball-goal-counter/models/matrecos-case-top-v1.1.stl',
-//         colorHex: '0xff7f00'
-//       }
-//     ]
-//   },
-//   {
-//     name: 'Ramp',
-//     obj: [
-//       {
-//         name: 'v0.1',
-//         src: 'foosball-goal-counter/models/matrecos-ramp-v0.1.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'Full v0.1',
-//         src: 'foosball-goal-counter/models/matrecos-ramp-full-v0.1.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v2.0',
-//         src: 'foosball-goal-counter/models/matrecos-ramp-v2.0.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v2.2',
-//         src: 'foosball-goal-counter/models/matrecos-ramp-v2.2.stl',
-//         colorHex: '0xff7f00'
-//       }
-//     ]
-//   },
-//   {
-//     name: 'Bridge',
-//     obj: [
-//       {
-//         name: 'v2.0',
-//         src: 'foosball-goal-counter/models/matrecos-bridge-v2.0.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v2.2',
-//         src: 'foosball-goal-counter/models/matrecos-bridge-v2.2.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v2.3',
-//         src: 'foosball-goal-counter/models/matrecos-bridge-v2.3.stl',
-//         colorHex: '0xff7f00'
-//       },
-//       {
-//         name: 'v2.4',
-//         src: 'foosball-goal-counter/models/matrecos-bridge-v2.4.stl',
-//         colorHex: '0xff7f00'
-//       }
-//     ]
-//   }
-// ]);
-
+const models = ref<ICascadeCategory[]>([
+  {
+    key: 'fgc-enclosure',
+    label: 'Enclosure',
+    children: [
+      {
+        key: 'fgc-case-bottom',
+        label: 'Bottom',
+        children: [
+          { key: 'fgc-bottom-v1.0', label: 'v1.0', src: 'foosball-goal-counter/models/bottom/matrecos-bottom-v1.0.stl', colorHex: '0xff8800' },
+          { key: 'fgc-bottom-v1.1', label: 'v1.1', src: 'foosball-goal-counter/models/bottom/matrecos-bottom-v1.1.stl', colorHex: '0xff8800' },
+          { key: 'fgc-bottom-v1.2', label: 'v1.2', src: 'foosball-goal-counter/models/bottom/matrecos-bottom-v1.2.stl', colorHex: '0xff9900' },
+          { key: 'fgc-bottom-v2.0', label: 'v2.0', src: 'foosball-goal-counter/models/bottom/matrecos-bottom-v2.0.stl', colorHex: '0xffa200' },
+          { key: 'fgc-bottom-v2.1', label: 'v2.1', src: 'foosball-goal-counter/models/bottom/matrecos-bottom-v2.1.stl', colorHex: '0xffaa00' },
+        ]
+      },
+      {
+        key: 'fgc-case-top',
+        label: 'Top',
+        children: [
+          { key: 'fgc-top-v0.1', label: 'v0.1', src: 'foosball-goal-counter/models/top/matrecos-top-v0.1.stl', colorHex: '0x00b7bd' },
+          { key: 'fgc-top-v1.0', label: 'v1.0', src: 'foosball-goal-counter/models/top/matrecos-top-v1.0.stl', colorHex: '0x00c1c7' },
+          { key: 'fgc-top-v1.1', label: 'v1.1', src: 'foosball-goal-counter/models/top/matrecos-top-v1.1.stl', colorHex: '0x00ccd2' },
+        ]
+      }
+    ]
+  },
+  {
+    key: 'fgc-sensor',
+    label: 'Sensor',
+    children: [
+      {
+        key: 'fgc-ramp',
+        label: 'Ramp',
+        children: [
+          { key: 'fgc-ramp-v0.1', label: 'v0.1', src: 'foosball-goal-counter/models/ramp/matrecos-ramp-v0.1.stl', colorHex: '0x3366ff' },
+          { key: 'fgc-ramp-v0.2', label: 'v0.2', src: 'foosball-goal-counter/models/ramp/matrecos-ramp-v0.2.stl', colorHex: '0x3366ff' },
+          { key: 'fgc-ramp-v0.21', label: 'v0.21', src: 'foosball-goal-counter/models/ramp/matrecos-ramp-v0.21.stl', colorHex: '0x2f5ee6' },
+          { key: 'fgc-ramp-v0.5', label: 'v0.5', src: 'foosball-goal-counter/models/ramp/matrecos-ramp-v0.5.stl', colorHex: '0x2f5ee6' },
+          { key: 'fgc-ramp-v2.0', label: 'v2.0', src: 'foosball-goal-counter/models/ramp/matrecos-ramp-v2.0.stl', colorHex: '0x294fbf' },
+          { key: 'fgc-ramp-v2.2', label: 'v2.2', src: 'foosball-goal-counter/models/ramp/matrecos-ramp-v2.2.stl', colorHex: '0x253fa6' },
+        ]
+      },
+      {
+        key: 'fgc-bridge',
+        label: 'Bridge',
+        children: [
+          { key: 'fgc-bridge-v2.0', label: 'v2.0', src: 'foosball-goal-counter/models/bridge/matrecos-bridge-v2.0.stl', colorHex: '0x00aa55' },
+          { key: 'fgc-bridge-v2.2', label: 'v2.2', src: 'foosball-goal-counter/models/bridge/matrecos-bridge-v2.2.stl', colorHex: '0x00aa55' },
+          { key: 'fgc-bridge-v2.3', label: 'v2.3', src: 'foosball-goal-counter/models/bridge/matrecos-bridge-v2.3.stl', colorHex: '0x00994d' },
+          { key: 'fgc-bridge-v2.4', label: 'v2.4', src: 'foosball-goal-counter/models/bridge/matrecos-bridge-v2.4.stl', colorHex: '0x008f48' },
+        ]
+      }
+    ]
+  },
+  {
+    key: 'fgc-assembly',
+    label: 'Assembly',
+    children: [
+      {
+        key: 'fgc-assembly-enclosure',
+        label: 'Enclosure',
+        children: [
+          {
+            key: 'fgc-assembly-enclosure-v1.0',
+            label: 'v1.0',
+            isGroup: true,
+            children: [
+              { key: 'fgc-enclosure-bottom', label: 'Bottom', src: 'foosball-goal-counter/models/assembly/enclosure/matrecos-bottom.stl', colorHex: '0xff8800', explodeOffset: {x: 0, y: 0, z: -10} },
+              { key: 'fgc-enclosure-top', label: 'Top', src: 'foosball-goal-counter/models/assembly/enclosure/matrecos-top.stl', colorHex: '0x00b7bd', explodeOffset: {x: 0, y: 0, z: 10} },
+            ]
+          }
+        ]
+      },
+      {
+        key: 'fgc-ramp-assembly-v0.5',
+        label: 'Ramp v0.5',
+        children: [
+          {
+            key: 'fgc-assembly-ramp-v0.5',
+            label: 'v0.5',
+            isGroup: true,
+            children: [
+              { key: 'fgc-ramp-assembly-v0.5-ramp-l', label: 'Left Ramp', src: 'foosball-goal-counter/models/assembly/ramp/v0.5/matrecos-ramp-l.stl', colorHex: '0x2f5ee6', explodeOffset: {x: -30, y: 0, z: 0} },
+              { key: 'fgc-ramp-assembly-v0.5-core-l', label: 'Left Core', src: 'foosball-goal-counter/models/assembly/ramp/v0.5/matrecos-core-l.stl', colorHex: '0x3366ff', explodeOffset: {x: -15, y: 0, z: 0} },
+              { key: 'fgc-ramp-assembly-v0.5-core-r', label: 'Right Core', src: 'foosball-goal-counter/models/assembly/ramp/v0.5/matrecos-core-r.stl', colorHex: '0x3366ff', explodeOffset: {x: 15, y: 0, z: 0} },
+              { key: 'fgc-ramp-assembly-v0.5-ramp-r', label: 'Right Ramp', src: 'foosball-goal-counter/models/assembly/ramp/v0.5/matrecos-ramp-r.stl', colorHex: '0x2f5ee6', explodeOffset: {x: 30, y: 0, z: 0} }
+            ]
+          }
+        ]
+      },
+      {
+        key: 'fgc-ramp-assembly-v2.2',
+        label: 'Ramp v2.2',
+        children: [
+          {
+            key: 'fgc-assembly-ramp-v2.2',
+            label: 'v2.2',
+            isGroup: true,
+            children: [
+              { key: 'fgc-ramp-assembly-v2.2-ramp-l', label: 'Left Ramp', src: 'foosball-goal-counter/models/assembly/ramp/v2.2/matrecos-ramp-l.stl', colorHex: '0x253fa6', explodeOffset: {x: 0, y: 0, z: 0} },
+              { key: 'fgc-ramp-assembly-v2.2-bridge', label: 'Bridge', src: 'foosball-goal-counter/models/assembly/ramp/v2.2/matrecos-bridge.stl', colorHex: '0x00aa55', explodeOffset: {x: 0, y: 0, z: 25} },
+              { key: 'fgc-ramp-assembly-v2.2-ramp-r', label: 'Right Ramp', src: 'foosball-goal-counter/models/assembly/ramp/v2.2/matrecos-ramp-r.stl', colorHex: '0x253fa6', explodeOffset: {x: 0, y: 0, z: 0} }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]);
 </script>
 
 <style scoped lang="sass">
-.project-view
-  padding: 0 32px
-  text-align: justify
-  hyphens: auto
-  .n-h1
-    margin-bottom: 0
-  .n-card
-    margin-top: 24px
-
-.carousel-wrapper
-  display: flex
-  justify-content: center
-  margin: 24px 0
-
-@media (max-width: 800px)
-  .project-view
-    padding: 0 4px !important
 </style>

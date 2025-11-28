@@ -1,7 +1,7 @@
 <template>
   <div class="project-view">
     <!-- Header Section -->
-    <n-h1>{{ name }}</n-h1>
+    <n-h1 class="squid-title">{{ name }}</n-h1>
     <div class="subtitle">
       <n-p class="squid-highlight">{{ formattedDate }}</n-p>
       <n-tag size="small" :type="statusType" :bordered="false">
@@ -69,6 +69,8 @@ const statusType = computed(() => {
       return 'success';
     case 'Prototype':
       return 'warning';
+    case 'Deprecated':
+      return 'error';
     case 'Ongoing':
     default:
       return 'info';

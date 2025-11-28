@@ -2,35 +2,28 @@
   <ProjectTemplate id="home-openscad" :media="media" :models="models">
     <n-p class="squid-semi-title">The Story</n-p>
     <n-p>
-      This OpenSCAD project was a comprehensive design exercise for home furnishings and fixtures. 
-      The collection includes various pieces designed with precise parametric modeling, from seating to storage solutions.
-      Each piece was carefully crafted to explore spatial relationships and fabrication possibilities. 
-      This project represents a significant body of work in 3D furniture design using parametric modeling techniques. 
+      This was a quick project I took on around the time I got my first 3D printer (and had plenty of time thanks to the COVID lockdown). 
+      I wanted to learn parametric modeling, and I thought the furniture in our house would be a great subject. 
+      It turned into a fun shared project with my mom, who started painting the real pieces while I was modeling their digital counterparts. 
+      Each model was built from scratch using real measurements, though I took some creative freedom for softer shapes like the sofas. 
+      The collection includes desks, shelves, cabinets, and other everyday furniture.
     </n-p>
-    <n-p class="squid-semi-title">Furniture Collection</n-p>
+    <n-p class="squid-semi-title">Key Features</n-p>
     <n-ul>
-      <n-li>Speaker: <span class="squid-text-alt">Living room speaker design</span></n-li>
-      <n-li>Bookcase: <span class="squid-text-alt">Storage solution for books and displays</span></n-li>
-      <n-li>TV Stand Drawer: <span class="squid-text-alt">Drawer component for TV entertainment unit</span></n-li>
-      <n-li>TV Stand: <span class="squid-text-alt">Main TV entertainment unit</span></n-li>
-      <n-li>Dining Room Table: <span class="squid-text-alt">Large dining surface</span></n-li>
-      <n-li>Support Table: <span class="squid-text-alt">Auxiliary side table</span></n-li>
-      <n-li>Puff: <span class="squid-text-alt">Ottoman seating</span></n-li>
-      <n-li>Sofa (Large): <span class="squid-text-alt">Main seating furniture</span></n-li>
-      <n-li>Armchair: <span class="squid-text-alt">Compact seating piece</span></n-li>
+      <n-li>Parametric: <span class="squid-text-alt">Models built with parametric dimensions, allowing for easy scaling and modification.</span></n-li>
+      <n-li>Code-Based Modeling: <span class="squid-text-alt">Modeled entirely in OpenSCAD, representing physical objects through code.</span></n-li>
+      <n-li>Real-World Based: <span class="squid-text-alt">Dimensions and designs based on actual furniture measurements and photos.</span></n-li>
     </n-ul>
-    <n-p class="squid-semi-title">Design Approach</n-p>
-    <n-p>
-      All pieces were designed using OpenSCAD, a script-based CAD program that emphasizes parametric design. 
-      This approach allows for precise control over dimensions and enables rapid iteration and adaptation. 
-      The design philosophy prioritized both form and function, with each piece considering spatial relationships and practical use cases.
-    </n-p>
     <n-p class="squid-semi-title">Tech Stack</n-p>
     <n-ul>
-      <n-li>CAD Design: <span class="squid-text-alt">OpenSCAD</span></n-li>
-      <n-li>Approach: <span class="squid-text-alt">Parametric modeling</span></n-li>
-      <n-li>Output Format: <span class="squid-text-alt">STL for 3D visualization</span></n-li>
+      <n-li>CAD Design: <span class="squid-text-alt">OpenSCAD for parametric, code-based 3D modeling.</span></n-li>
     </n-ul>
+    <n-p class="squid-semi-title">Challenges & Lessons Learned</n-p>
+    <n-p>
+      The main challenge was accurately representing complex and soft shapes, like sofas, using a purely programmatic CAD tool like OpenSCAD. 
+      This required creative problem-solving to approximate organic forms with geometric primitives. 
+      This project was an excellent introduction to parametric design and the unique workflow of "programming" physical objects.
+    </n-p>
     <n-p class="squid-semi-title">Links</n-p>
     <n-ul>
       <n-li><n-a href="toDo">[GitHub Repository]</n-a></n-li>
@@ -47,13 +40,12 @@ const media = ref<IMedia[]>([
   {
     type: 'video',
     src: 'home-scad/videos/VID_20200501_205604.mp4',
+    description: 'printing the sofa'
   },
-  { type: 'image', src: 'home-scad/images/IMG-20200428-WA0016.jpg', description: 'Early speaker enclosure concept' },
-  { type: 'image', src: 'home-scad/images/IMG-20200428-WA0018.jpg', description: 'Bookcase module parametric layout' },
-  { type: 'image', src: 'home-scad/images/IMG-20200429-WA0002.jpg', description: 'TV stand structural framing in OpenSCAD' },
-  { type: 'image', src: 'home-scad/images/IMG-20200429-WA0007.jpg', description: 'Dining table proportional study' },
-  { type: 'image', src: 'home-scad/images/IMG-20200507-WA0010.jpg', description: 'Support table leg joinery view' },
-  { type: 'image', src: 'home-scad/images/IMG_20200430_113830.jpg', description: 'Armchair and puff scale reference' }
+  { type: 'image', src: 'home-scad/images/IMG-20200428-WA0016.jpg', description: 'old photo designing the sofa in OpenSCAD' },
+  { type: 'image', src: 'home-scad/images/IMG-20200429-WA0002.jpg', description: 'some of the prints at the time' },
+  { type: 'image', src: 'home-scad/images/IMG-20200429-WA0007.jpg', description: 'my parent\'s living room' },
+  { type: 'image', src: 'home-scad/images/IMG_20200430_113830.jpg', description: 'some size iterations' }
 ]);
 
 const models = ref<ICascadeCategory[]>([
@@ -61,7 +53,7 @@ const models = ref<ICascadeCategory[]>([
     key: 'hs-speaker',
     label: 'Speaker',
     src: 'home-scad/models/coluna-sala-30.stl',
-    colorHex: '0xff7f00'
+    colorHex: '0x040404'
   },
   {
     key: 'hs-bookcase',

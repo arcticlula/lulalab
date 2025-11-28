@@ -347,7 +347,7 @@ onMounted(() => {
 
 function initThree() {
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(props.backgroundColor || 0x000000);
+  scene.background = new THREE.Color(props.backgroundColor || getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim() || '#101014');
 
   const w = viewerContainer.value!.clientWidth;
   const h = 500;

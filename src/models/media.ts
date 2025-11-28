@@ -2,7 +2,8 @@ export interface IMedia {
   type: 'image' | 'video';
   src: string;
   description?: string;
-  poster?: string;
+  linkTo?: string;
+  linkLabel?: string;
 }
 
 export interface IModel {

@@ -19,27 +19,54 @@
     </div>
     
     <n-grid v-if="$route.name === 'projects'" cols="1 s:2 m:2 l:3" :x-gap="24" :y-gap="24" responsive="screen">
-      <n-gi v-for="project in filteredProjects" :key="project.name">
+      <n-gi v-for="project in displayedProjects" :key="project.name">
         <n-card class="card" hoverable>
           <template #header>
             <div class="card-header">
-              <span class="card-title">{{ project.name }}</span>
+              <span class="card-title squid-title">{{ project.name }}</span>
               <span class="card-date">{{  formatMonthYear(project.date) }}</span>
             </div>
           </template>
           <template #cover>
             <router-link :to="{ name: project.routeName }">
-              <img v-if="project.srcType === 'image'" class="card-image" :src="project.src">
-              <video
-                v-else-if="project.srcType === 'video'"
-                class="card-video"
-                :src="project.src"
-                autoplay
-                loop
-                muted
-                playsinline
-                preload="auto"
-              />
+              <!-- Images: use <picture> for graceful fallback -->
+              <template v-if="project.srcType === 'image'">
+                <picture v-if="!failedAvif.has(project.name)">
+                  <source :srcset="project.avifSrc" type="image/avif" />
+                  <img
+                    class="card-image"
+                    :src="project.originalSrc"
+                    :alt="project.name + ' preview'"
+                    @error="onImageAvifFail(project)"
+                  />
+                </picture>
+                <img
+                  v-else
+                  class="card-image"
+                  :src="project.originalSrc"
+                  :alt="project.name + ' preview'"
+                />
+              </template>
+              <!-- Videos: prefer AVIF still; fallback to video if AVIF fails -->
+              <template v-else>
+                <img
+                  v-if="!failedAvif.has(project.name)"
+                  class="card-image"
+                  :src="project.avifSrc"
+                  :alt="project.name + ' video preview'"
+                  @error="onVideoAvifFail(project)"
+                />
+                <video
+                  v-else
+                  class="card-video"
+                  :src="project.originalSrc"
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  preload="auto"
+                />
+              </template>
             </router-link>
           </template>
           <div class="card-content">
@@ -75,6 +102,12 @@
   const activeTags = ref<string[]>([]);
 
   const projects = ref<Project[]>(projectData);
+
+  import { useAvif } from '../composables/useAvif';
+  const { deriveAvifPath } = useAvif();
+
+  interface DisplayProject extends Project { avifSrc: string; originalSrc: string }
+  const failedAvif = ref<Set<string>>(new Set());
   
   const sortedProjects = computed(() => {
     return [...projects.value].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -88,6 +121,29 @@
       activeTags.value.every(tag => project.keywords.includes(tag))
     );
   });
+
+  const displayedProjects = computed<DisplayProject[]>(() => {
+    return filteredProjects.value.map(p => {
+      const explicitIsAvif = p.src.toLowerCase().endsWith('.avif');
+      const avifCandidate = explicitIsAvif ? p.src : deriveAvifPath(p.src);
+      return { ...p, avifSrc: avifCandidate, originalSrc: p.src };
+    });
+  });
+
+  function onImageAvifFail(project: DisplayProject) {
+    if (!failedAvif.value.has(project.name)) {
+      const s = new Set(failedAvif.value);
+      s.add(project.name);
+      failedAvif.value = s;
+    }
+  }
+  function onVideoAvifFail(project: DisplayProject) {
+    if (!failedAvif.value.has(project.name)) {
+      const s = new Set(failedAvif.value);
+      s.add(project.name);
+      failedAvif.value = s;
+    }
+  }
 
   function toggleTagFilter(tag: string) {
     const index = activeTags.value.indexOf(tag);

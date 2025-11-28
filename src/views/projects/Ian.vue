@@ -60,12 +60,10 @@ const media = ref<IMedia[]>([
   {
     type: 'video',
     src: 'mood-light/videos/PXL_20250911_232403363.mp4',
-    poster: 'mood-light/images/PXL_20250911_102431507.jpg',
   },
   {
     type: 'video',
     src: 'mood-light/videos/PXL_20250908_162742176.mp4',
-    poster: 'mood-light/images/PXL_20250908_162742176.jpg',
   },
   {
     type: 'image',

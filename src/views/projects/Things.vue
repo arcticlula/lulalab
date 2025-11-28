@@ -1,86 +1,42 @@
 <template>
-  <div class="project-view">
-    <n-h1>Simple Monophonic FM Transmitter</n-h1>
-    <n-p><strong>June 2013</strong></n-p>
-    <n-blockquote>
-      A simple, battery-powered monophonic FM transmitter built "deadbug-style" 
-      with discrete components, designed to broadcast audio from a device like a 
-      mp3 player to any standard FM radio receiver.
-    </n-blockquote>
-    <div class="carousel-wrapper">
-      <Carousel :images="images" />
-    </div>
-    <n-p><strong>The Story</strong></n-p>
+  <ProjectTemplate id="things">
+    <n-p class="squid-semi-title">The Story</n-p>
     <n-p>
-      One of my earlier projects was this simple FM transmitter, built
-      "deadbug-style" based on a popular online schematic. The frequency can be
-      finely tuned with a variable capacitor, though finding the base
-      frequency the first time was a challenge. The entire circuit, which runs
-      off a 9V battery, is housed in a metal cigar box. Audio input is handled
-      through a 6.3mm to 3.5mm jack adapter, making it easy to plug in almost
-      any device. My favorite use was connecting a guitar and “playing”
-      directly through a nearby radio.
+      A simple web app to keep track of everything inside my cabinets, drawers, and storage boxes — essentially a personal digital inventory for all the random things lying around, especially electronic parts. While still a work in progress, it's already quite functional. Each storage space (like a drawer) can contain multiple containers or individual items, making it easy to quickly search for something and find its exact location. The app is built with a modern frontend stack and hosted on Firebase.
     </n-p>
-    <n-p><strong>Key Features</strong></n-p>
+    <n-p><em>(A screenshot of the app's interface would be perfect here, showing the organization of items and containers.)</em></n-p>
+    <n-p class="squid-semi-title">Key Features</n-p>
     <n-ul>
-      <n-li>Broadcasts monophonic audio over the standard FM band.</n-li>
-      <n-li>Fine frequency tuning via a variable capacitor.</n-li>
-      <n-li>Hand-wound inductor coil.</n-li>
-      <n-li>6.3mm audio input.</n-li>
-      <n-li>Portable, self-contained unit powered by a 9V battery.</n-li>
+      <n-li><span class="squid-text-alt">Hierarchical organization with spaces, containers, and items.</span></n-li>
+      <n-li><span class="squid-text-alt">Fast search to locate any logged item.</span></n-li>
+      <n-li><span class="squid-text-alt">Modern, clean interface using Naive UI components.</span></n-li>
+      <n-li><span class="squid-text-alt">Hosted live as a web application.</span></n-li>
+      <n-li><span class="squid-text-alt">Work in progress with iterative improvements.</span></n-li>
     </n-ul>
-    <n-p><strong>Tech Stack</strong></n-p>
+    <n-p class="squid-semi-title">Tech Stack</n-p>
     <n-ul>
-      <n-li><strong>Style:</strong> Deadbug-style point-to-point soldering</n-li>
-      <n-li><strong>Components:</strong> Discrete transistors, resistors, capacitors (including a variable capacitor), hand-wound inductor.</n-li>
-      <n-li><strong>Power:</strong> 9V battery</n-li>
+      <n-li><span class="squid-text-alt">Vue 3 (Composition API)</span></n-li>
+      <n-li><span class="squid-text-alt">Vite</span></n-li>
+      <n-li><span class="squid-text-alt">TypeScript</span></n-li>
+      <n-li><span class="squid-text-alt">Naive UI</span></n-li>
+      <n-li><span class="squid-text-alt">Firebase Hosting</span></n-li>
     </n-ul>
-    <n-p><strong>Challenges & Lessons Learned</strong></n-p>
+    <n-p class="squid-semi-title">Challenges & Lessons Learned</n-p>
     <n-p>
-      The biggest lesson from this project was in RF (Radio Frequency) design,
-      specifically regarding enclosure materials. Housing the circuit in a
-      metal cigar box created a Faraday cage effect, which significantly
-      interfered with the signal strength. The transmitter only worked
-      properly with the lid open, teaching me a valuable, practical lesson
-      about how enclosure choices can impact antenna performance and signal
-      propagation.
+      The main design challenge is creating a data structure flexible enough to handle various storage scenarios (from a single box to a multi-shelf cabinet) while keeping the UI for adding and finding items fast and intuitive. It’s an ongoing balance between modeling complexity and user experience for a practical personal tool.
     </n-p>
-    <n-p><strong>Links</strong></n-p>
-    <n-p>
-        <n-a href="https://anarchy.translocal.jp/radio/micro/howtosimplestTX.html" target="_blank">
-            Original Schematic/Design 
-        </n-a>
-        - glad to see the original link still works!
-    </n-p>
-  </div>
+    <n-p class="squid-semi-title">Links</n-p>
+    <n-ul>
+      <n-li><n-a href="https://things-storage.web.app/#/" target="_blank">[Live Demo]</n-a></n-li>
+      <n-li><n-a href="https://github.com/arcticlula/Things" target="_blank">[GitHub Repository]</n-a></n-li>
+    </n-ul>
+  </ProjectTemplate>
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue';
-
-  const images = ref<string[]>([
-    'https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel1.jpeg',
-    'https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel2.jpeg',
-    'https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel3.jpeg',
-    'https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel4.jpeg',
-  ]);
-
+import ProjectTemplate from '../../components/ProjectTemplate.vue';
 
 </script>
 
 <style scoped lang="sass">
-.project-view
-  padding: 0 32px
-  text-align: justify
-  hyphens: auto
-  .n-h1
-    margin-bottom: 0
-  .n-card
-    margin-top: 24px
-
-.carousel-wrapper
-  display: flex
-  justify-content: center
-  margin: 24px 0
-
 </style>
