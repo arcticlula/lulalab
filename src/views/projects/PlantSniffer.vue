@@ -36,7 +36,7 @@
     </n-p>
     <n-p class="squid-semi-title">Links</n-p>
     <n-ul>
-      <n-li><n-a href="toDo">[GitHub Repository]</n-a></n-li>
+      <n-li><n-a href="https://github.com/arcticlula/Plant-Sniffer">[GitHub Repository]</n-a></n-li>
       <n-li><n-a href="https://cad.onshape.com/documents/f09e939da9b2461bcee0bb02/w/fad8a904ca1fb72f1758850a/e/9bfed1484d204b0a318f43eb?renderMode=0&uiState=69237d3c0628a6c66d000ea9">[OnShape]</n-a></n-li>
     </n-ul>
   </ProjectTemplate>
