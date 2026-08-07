@@ -33,7 +33,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { logData } from '../data/logs';
-import { formatMonthYear } from '../utils/date';
 import LogLoader from '../components/LogLoader.vue';
 
 const selectedKeys = ref<string[]>([]);

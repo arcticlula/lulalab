@@ -24,6 +24,9 @@
           </template>
           <template v-slot:footer>
             <span v-html="item.description"></span>
+            <ul v-if="item.details" class="details">
+              <li v-for="(detail, i) in item.details" :key="i" v-html="detail"></li>
+            </ul>
           </template>
         </CVEntry>
       </n-gi>
@@ -64,6 +67,15 @@
   background-color: rgba(250,233,218,0.5)
 .blue
   background-color: rgba(195,224,221,0.5)
+
+.details
+  margin: 8px 0 0 0
+  padding-left: 20px
+  li
+    margin-bottom: 4px
+    line-height: 1.4
+    &:last-child
+      margin-bottom: 0
 
 .pink-text
   color: rgba(255,198,194)

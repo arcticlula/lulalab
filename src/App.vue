@@ -13,7 +13,7 @@
         <n-flex class="header" justify="center">
           <router-link to="/"><n-button text>Home</n-button></router-link> |
           <router-link to="/projects"><n-button text>Projects</n-button></router-link> |
-          <router-link to="/logs"><n-button text>Logs</n-button></router-link> |
+          <!-- | <router-link to="/logs"><n-button text>Logs</n-button></router-link> -->
           <router-link to="/cv"><n-button text>CV</n-button></router-link>
           <!-- | <router-link to="/about"><n-button text>Acerca</n-button></router-link> -->
         </n-flex>

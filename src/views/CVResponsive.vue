@@ -14,6 +14,9 @@
           <div class="timeline-content">
             <n-p style="margin: 0 0 8px 0; font-weight: bold; font-size: 0.9rem; color: #e2e2e2">{{ item.subtitle }}</n-p>
             <n-p style="margin: 0; opacity: 0.8; line-height: 1.5; font-size: 0.7rem;" v-html="item.description"></n-p>
+            <ul v-if="item.details" class="details">
+              <li v-for="(detail, i) in item.details" :key="i" v-html="detail"></li>
+            </ul>
           </div>
         </n-timeline-item>
       </n-timeline>
@@ -81,6 +84,17 @@ h2
     transform: translateX(4px)
     background-color: rgba(255, 255, 255, 0.08)
     border-left-color: rgba(255, 255, 255, 0.5)
+
+.details
+  margin: 8px 0 0 0
+  padding-left: 18px
+  opacity: 0.8
+  font-size: 0.7rem
+  line-height: 1.5
+  li
+    margin-bottom: 4px
+    &:last-child
+      margin-bottom: 0
 
 @media (max-width: 600px)
   .cv-container

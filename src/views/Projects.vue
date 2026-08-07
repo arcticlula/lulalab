@@ -4,15 +4,75 @@
 
     <div v-if="$route.name === 'projects'" class="toggle-wrapper">
       <n-radio-group v-model:value="viewMode" size="medium">
-        <n-radio-button value="grid" title="Grid View">
-          <n-icon size="18" style="vertical-align: middle;"><GridIcon /></n-icon>
-        </n-radio-button>
         <n-radio-button value="tree" title="Tree View">
           <n-icon size="18" style="vertical-align: middle;"><TreeIcon /></n-icon>
+        </n-radio-button>
+        <n-radio-button value="grid" title="Grid View">
+          <n-icon size="18" style="vertical-align: middle;"><GridIcon /></n-icon>
         </n-radio-button>
       </n-radio-group>
     </div>
     
+    <div v-if="$route.name === 'projects' && viewMode === 'tree'" class="tree-view-container">
+      <div class="tree-sidebar">
+        <n-tree
+          block-line
+          expand-on-click
+          selectable
+          default-expand-all
+          :data="treeData"
+          @update:selected-keys="handleTreeSelect"
+        />
+      </div>
+      <div class="tree-content">
+        <div 
+          v-for="project in filteredProjects" 
+          :key="project.name" 
+          :id="'project-' + project.name"
+          class="project-details"
+        >
+          <div class="post-date">{{ formatMonthYear(project.date) }}</div>
+          <div class="post-title squid-title">{{ project.name }}</div>
+          
+          <div class="project-media-container">
+            <router-link :to="{ name: project.routeName }">
+              <img v-if="project.srcType === 'image'" class="project-media" :src="project.src">
+              <video
+                v-else-if="project.srcType === 'video'"
+                class="project-media"
+                :src="project.src"
+                autoplay
+                loop
+                muted
+                playsinline
+                preload="auto"
+              />
+            </router-link>
+          </div>
+          
+          <div class="card-content project-desc">
+            {{ project.description }}
+          </div>
+          
+          <div class="project-footer">
+            <n-space>
+              <n-tag
+                v-for="keyword in project.keywords"
+                size="small"
+                :key="keyword"
+                class="keyword-tag"
+                :type="activeTags.includes(keyword) ? 'info' : 'success'"
+                :bordered="false"
+                @click="toggleTagFilter(keyword)"
+              >
+                {{ keyword }}
+              </n-tag>
+            </n-space>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <n-grid v-if="$route.name === 'projects' && viewMode === 'grid'" cols="1 s:2 m:2 l:3" :x-gap="24" :y-gap="24" responsive="screen">
       <n-gi v-for="project in displayedProjects" :key="project.name">
         <n-card class="card" hoverable>
@@ -86,66 +146,6 @@
       </n-gi>
     </n-grid>
 
-    <div v-if="$route.name === 'projects' && viewMode === 'tree'" class="tree-view-container">
-      <div class="tree-sidebar">
-        <n-tree
-          block-line
-          expand-on-click
-          selectable
-          default-expand-all
-          :data="treeData"
-          @update:selected-keys="handleTreeSelect"
-        />
-      </div>
-      <div class="tree-content">
-        <div 
-          v-for="project in filteredProjects" 
-          :key="project.name" 
-          :id="'project-' + project.name"
-          class="project-details"
-        >
-          <div class="post-date">{{ formatMonthYear(project.date) }}</div>
-          <div class="post-title">{{ project.name }}</div>
-          
-          <div class="project-media-container">
-            <router-link :to="{ name: project.routeName }">
-              <img v-if="project.srcType === 'image'" class="project-media" :src="project.src">
-              <video
-                v-else-if="project.srcType === 'video'"
-                class="project-media"
-                :src="project.src"
-                autoplay
-                loop
-                muted
-                playsinline
-                preload="auto"
-              />
-            </router-link>
-          </div>
-          
-          <div class="card-content project-desc">
-            {{ project.description }}
-          </div>
-          
-          <div class="project-footer">
-            <n-space>
-              <n-tag
-                v-for="keyword in project.keywords"
-                size="small"
-                :key="keyword"
-                class="keyword-tag"
-                :type="activeTags.includes(keyword) ? 'info' : 'success'"
-                :bordered="false"
-                @click="toggleTagFilter(keyword)"
-              >
-                {{ keyword }}
-              </n-tag>
-            </n-space>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Sticky filter at the bottom -->
     <div v-if="$route.name === 'projects'" class="sticky-filter-wrapper">
       <div class="filter-space glass-pill" v-if="activeTags.length > 0">
@@ -174,8 +174,8 @@
   import { formatMonthYear } from '../utils/date';
   import { projectData, Project } from '../data/projects';
 
-  type ViewMode = 'grid' | 'tree';
-  const viewMode = ref<ViewMode>((localStorage.getItem('viewMode') as ViewMode) || 'grid');
+  type ViewMode = 'tree' | 'grid';
+  const viewMode = ref<ViewMode>((localStorage.getItem('viewMode') as ViewMode) || 'tree');
 
   watch(viewMode, (newMode) => {
     localStorage.setItem('viewMode', newMode);

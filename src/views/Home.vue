@@ -67,7 +67,9 @@ const failedAvif = ref(false);
 const router = useRouter();
 
 const recentProjects = computed(() => {
-  return projectData.slice(0, 3);
+  return [...projectData]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 3);
 });
 
 function goToRandomProject() {
