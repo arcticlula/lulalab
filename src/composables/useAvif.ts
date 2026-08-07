@@ -41,13 +41,16 @@ function runDetection(): Promise<boolean> {
 export function deriveAvifPath(original: string): string {
   if (!original) return original;
   if (original.toLowerCase().endsWith('.avif')) return original;
-  const match = original.match(/^(.*\/(images|videos)\/)(.*)$/i);
-  if (!match) return original;
-  const base = match[1];
-  const filename = match[3];
+  // Only media living under an images/ or videos/ tree has AVIF siblings
+  if (!/\/(images|videos)\//i.test(original)) return original;
+  const slash = original.lastIndexOf('/');
+  // The avif/ folder sits next to the file itself, so subfolders (e.g. images/pcbs/) resolve to images/pcbs/avif/
+  const dir = original.substring(0, slash + 1);
+  if (/\/avif\/$/i.test(dir)) return original;
+  const filename = original.substring(slash + 1);
   const dot = filename.lastIndexOf('.');
   const stem = dot > -1 ? filename.substring(0, dot) : filename;
-  return `${base}avif/${stem}.avif`;
+  return `${dir}avif/${stem}.avif`;
 }
 
 export function getPreferredImage(original: string): string {

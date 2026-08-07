@@ -10,10 +10,10 @@
     </n-p>
     <n-p class="squid-semi-title">Key Features</n-p>
     <n-ul>
-      <n-li>FM Broadcasting: <span class="squid-text-alt">Broadcasts monophonic audio over the standard FM band.</span></n-li>
+      <n-li>FM Broadcasting: <span class="squid-text-alt">Broadcasts monophonic audio over the standard FM band. (95.70 MHz last time I checked.)</span></n-li>
       <n-li>Fine Tuning: <span class="squid-text-alt">Frequency adjustment via variable capacitor.</span></n-li>
-      <n-li>Hand-Wound Inductor: <span class="squid-text-alt">Custom coil wound for the LC oscillator circuit.</span></n-li>
-      <n-li>Input: <span class="squid-text-alt">6.3mm audio jack with a 6.3mm to 3.5mm adapter if needed.</span></n-li>
+      <n-li>Hand-Wound Inductor: <span class="squid-text-alt">Custom coil wound by hand for the LC oscillator circuit.</span></n-li>
+      <n-li>Audio Input: <span class="squid-text-alt">6.3mm audio jack with a 6.3mm to 3.5mm adapter if needed.</span></n-li>
       <n-li>Portable Design: <span class="squid-text-alt">Self-contained unit powered by a 9V battery.</span></n-li>
     </n-ul>
     <n-p class="squid-semi-title">Tech Stack</n-p>
@@ -42,8 +42,11 @@ import ProjectTemplate from '../../components/ProjectTemplate.vue';
 import { IMedia } from '../../models/media';
 
 const media = ref<IMedia[]>([
-  { type: 'image', src: 'fm-transmitter/images/simplesttxstandard01.jpg', description: 'FM transmitter circuit deadbug construction' },
-  // toDo
+  { type: 'image', src: 'fm-transmitter/images/IMG_3957.jpg', description: 'only works with the lid open since i had the brilliant idea of housing the circuit in a metal box' },
+  { type: 'image', src: 'fm-transmitter/images/IMG_3962.jpg', description: 'here we can kinda see the copper islands on top of the big copper ground plane' },
+  { type: 'image', src: 'fm-transmitter/images/IMG_3963.jpg', description: 'front' },
+  { type: 'image', src: 'fm-transmitter/images/IMG_3964.jpg', description: 'back' },
+  { type: 'image', src: 'fm-transmitter/images/simplesttxstandard01.jpg', description: 'the circuit i based the design on - mine looks better no?' },
 ]);
 
 </script>

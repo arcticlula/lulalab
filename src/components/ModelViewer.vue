@@ -21,6 +21,9 @@
           </div>
         </n-radio-group>
       </div>
+      <div class="bare-list" v-if="bareAvailable">
+        <n-checkbox v-model:checked="bare">Bare board</n-checkbox>
+      </div>
       <div class="checkbox-list" v-if="selectedVersionIsGroup">
       <label class="label"><strong>Parts:</strong></label>
       <n-checkbox-group v-model:value="visibleParts" >
@@ -61,6 +64,7 @@ let camera: THREE.PerspectiveCamera;
 let renderer: THREE.WebGLRenderer;
 let controls: OrbitControls;
 let currentGroup: THREE.Group | null = null;
+let pivotHelpers: THREE.Group = new THREE.Group();
 
 const stlLoader = new STLLoader();
 const vrmlLoader = new VRMLLoader();
@@ -71,12 +75,16 @@ const cascaderValue = ref<string | null>(null);
 
 const visibleParts = ref<string[]>([]);
 const selectedVersionSrc = ref<string | null>(null);
+// show the board with no components on it, when a bare counterpart exists
+const bare = ref(false);
 
 let currentModuleName: string | null = null;
 const isExploded = ref(false);
 let originalPositions = new Map<string, THREE.Vector3>();
+let originalRotations = new Map<string, THREE.Euler>();
 let baseDirections = new Map<string, THREE.Vector3>();
 let customExplodeOffsets = new Map<string, { x: number; y: number; z: number }>();
+let customExplodeRotations = new Map<string, { x: number; y: number; z: number }>();
 let modelSize = 1;
 
 // Cache for model lookups to avoid repeated searching
@@ -133,8 +141,16 @@ const cascadeOptions = computed(() => {
   return options;
 });
 
+// bare entries fall back to the populated model, so an entry without a bare
+// counterpart keeps working with the toggle left on
+function resolveSrc(entry: any, fallback: string | null = null): string | null {
+  const src = entry?.src ?? fallback;
+  if (!src) return null;
+  return bare.value && entry?.bareSrc ? entry.bareSrc : src;
+}
+
 const versionData = computed(() => {
-  const none = { versionOptions: [], isGroup: false, children: [], filePaths: [] };
+  const none = { versionOptions: [], isGroup: false, children: [], filePaths: [], hasBare: false };
   if (!selectedPath.value || selectedPath.value.length < 1) {
     return none;
   }
@@ -147,11 +163,13 @@ const versionData = computed(() => {
 
   // Leaf item without versions: load directly
   if (!item.children || item.children.length === 0) {
+    const src = resolveSrc(item);
     return {
       versionOptions: [],
       isGroup: false,
       children: [],
-      filePaths: item.src ? [item.src] : []
+      filePaths: src ? [src] : [],
+      hasBare: !!item.bareSrc
     };
   }
 
@@ -164,6 +182,7 @@ const versionData = computed(() => {
       isGroup,
       children: (v as any).children,
       src: (v as any).src,
+      bareSrc: (v as any).bareSrc,
       colorHex: (v as any).colorHex,
       opacity: (v as any).opacity
     };
@@ -177,7 +196,7 @@ const versionData = computed(() => {
   
   if (selectedVersionSrc.value) {
     if (selectedVersionSrc.value.includes('/')) {
-      filePaths = [selectedVersionSrc.value];
+      filePaths = [resolveSrc(currentVersion, selectedVersionSrc.value)!];
     } else if (currentVersion) {
       if (isCurrentGroup && currentVersion.children) {
         children = (currentVersion.children as any[]).map((c: any) => ({
@@ -186,18 +205,25 @@ const versionData = computed(() => {
         }));
         filePaths = visibleParts.value.length > 0 ? visibleParts.value : [];
       } else if (currentVersion.src) {
-        filePaths = [currentVersion.src];
+        filePaths = [resolveSrc(currentVersion)!];
       }
     }
   }
 
-  return { versionOptions, isGroup: isCurrentGroup, children, filePaths };
+  return {
+    versionOptions,
+    isGroup: isCurrentGroup,
+    children,
+    filePaths,
+    hasBare: !isCurrentGroup && !!(currentVersion as any)?.bareSrc
+  };
 });
 
 const versionOptions = computed(() => versionData.value.versionOptions);
 const selectedVersionIsGroup = computed(() => versionData.value.isGroup);
 const currentVersionChildren = computed(() => versionData.value.children);
 const filePaths = computed(() => versionData.value.filePaths);
+const bareAvailable = computed(() => versionData.value.hasBare);
 
 // Initialize default selection when models are ready
 watch(() => props.models, () => {
@@ -332,6 +358,12 @@ watch(visibleParts, () => {
 }, { deep: true });
 
 
+// same selection, different file: reload without touching the camera
+watch(bare, () => {
+  if (!bareAvailable.value) return;
+  loadModel();
+});
+
 watch(selectedVersionIsGroup, (isGroup) => {
   if (!isGroup && isExploded.value) {
     isExploded.value = false;
@@ -379,6 +411,7 @@ function initThree() {
   const backLight = new THREE.DirectionalLight(0xffffff, 0.3);
   backLight.position.set(0, -5, -5);
   scene.add(backLight);
+  scene.add(pivotHelpers);
 }
 
 async function loadModel() {
@@ -407,7 +440,6 @@ async function loadModel() {
     } else {
       const geom = await loadSTL(path);
       const mesh = createMeshWithMaterial(geom, path);
-      mesh.position.set(0, 0, 0);
       mesh.userData.src = path;
       meshes.push(mesh);
       currentGroup.add(mesh);
@@ -443,18 +475,43 @@ async function loadModel() {
     controls.update();
   }
 
-  // Store original positions for newly loaded meshes (only for STL meshes)
+  // Store original positions and rotations for newly loaded meshes (only for STL meshes)
   currentGroup.children.forEach((mesh) => {
     if (!(mesh instanceof THREE.Mesh)) return;
     const key = mesh.userData.src;
     if (!originalPositions.has(key)) {
       originalPositions.set(key, mesh.position.clone());
     }
+    if (!originalRotations.has(key)) {
+      originalRotations.set(key, mesh.rotation.clone());
+    }
   });
 
   if (isExploded.value) {
     reapplyExplosion();
   }
+
+  updatePivotHelpers();
+}
+
+function updatePivotHelpers() {
+  pivotHelpers.clear();
+  if (!currentGroup) return;
+
+  currentGroup.children.forEach(mesh => {
+    const key = mesh.userData.src;
+    const part = allParts.value.find(p => p.src === key);
+    if (part?.rotationPivot) {
+      const dot = new THREE.Mesh(
+        new THREE.SphereGeometry(0.5),
+        new THREE.MeshBasicMaterial({ color: 0xff0000, depthTest: false, transparent: true, opacity: 0.8 })
+      );
+      dot.renderOrder = 999;
+      // The pivot point in world space is the mesh's position (because we compensated)
+      dot.position.copy(mesh.position);
+      pivotHelpers.add(dot);
+    }
+  });
 }
 
 
@@ -481,6 +538,22 @@ function createMeshWithMaterial(geometry: THREE.BufferGeometry, path: string) {
       const srcFile = p.src.split("/").pop()?.toLowerCase();
       return srcFile === fileKey;
     });
+  }
+
+  // Apply rotation pivot if defined (relative to part center)
+  let finalPivot = new THREE.Vector3(0, 0, 0);
+  if (part?.rotationPivot) {
+    geometry.computeBoundingBox();
+    const center = new THREE.Vector3();
+    geometry.boundingBox!.getCenter(center);
+    
+    finalPivot.set(
+      part.rotationPivot.x + center.x,
+      part.rotationPivot.y + center.y,
+      part.rotationPivot.z + center.z
+    );
+
+    geometry.translate(-finalPivot.x, -finalPivot.y, -finalPivot.z);
   }
 
   const colorHex = part?.colorHex ?? "0xffffff";
@@ -517,7 +590,16 @@ function createMeshWithMaterial(geometry: THREE.BufferGeometry, path: string) {
     );
   };
 
-  return new THREE.Mesh(geometry, material);
+  const mesh = new THREE.Mesh(geometry, material);
+  
+  // Compensate for pivot shift to keep visual position
+  if (part?.rotationPivot) {
+    mesh.position.copy(finalPivot);
+  } else {
+    mesh.position.set(0, 0, 0);
+  }
+
+  return mesh;
 }
 
 function fitCameraToModel(obj?: THREE.Object3D) {
@@ -577,7 +659,17 @@ function explodeModel() {
       target = mesh.position.clone().add(dir.clone().multiplyScalar(distance));
     }
 
-    animateMeshPosition(mesh, target);
+    const customRotation = customExplodeRotations.get(key);
+    let targetRot = originalRotations.get(key)!.clone();
+    if (customRotation) {
+      targetRot.set(
+        THREE.MathUtils.degToRad(customRotation.x),
+        THREE.MathUtils.degToRad(customRotation.y),
+        THREE.MathUtils.degToRad(customRotation.z)
+      );
+    }
+
+    animateMesh(mesh, target, targetRot);
   });
 }
 
@@ -599,13 +691,25 @@ function reapplyExplosion() {
       target = mesh.position.clone().add(dir.clone().multiplyScalar(distance));
     }
     
+    const customRotation = customExplodeRotations.get(key);
+    let targetRot = originalRotations.get(key)!.clone();
+    if (customRotation) {
+      targetRot.set(
+        THREE.MathUtils.degToRad(customRotation.x),
+        THREE.MathUtils.degToRad(customRotation.y),
+        THREE.MathUtils.degToRad(customRotation.z)
+      );
+    }
+
     mesh.position.copy(target);
+    mesh.rotation.copy(targetRot);
   });
 }
 
 function computeBaseExplosionVectors(meshes: THREE.Mesh[], referenceGroup: THREE.Group, parts?: any[]) {
   baseDirections.clear();
   customExplodeOffsets.clear();
+  customExplodeRotations.clear();
 
   const box = new THREE.Box3().setFromObject(referenceGroup);
   const centerWorld = box.getCenter(new THREE.Vector3());
@@ -633,6 +737,9 @@ function computeBaseExplosionVectors(meshes: THREE.Mesh[], referenceGroup: THREE
       if (partData?.explodeOffset) {
         customExplodeOffsets.set(mesh.userData.src, partData.explodeOffset);
       }
+      if (partData?.explodeRotation) {
+        customExplodeRotations.set(mesh.userData.src, partData.explodeRotation);
+      }
     }
   }
 }
@@ -643,15 +750,19 @@ function resetModel() {
   currentGroup.children.forEach(mesh => {
     if (!(mesh instanceof THREE.Mesh)) return;
 
-    const orig = originalPositions.get(mesh.userData.src);
-    if (!orig) return;
+    const origPos = originalPositions.get(mesh.userData.src);
+    const origRot = originalRotations.get(mesh.userData.src);
+    if (!origPos || !origRot) return;
 
-    animateMeshPosition(mesh, orig);
+    animateMesh(mesh, origPos, origRot);
   });
 }
 
-function animateMeshPosition(mesh: THREE.Object3D, target: THREE.Vector3) {
-  const start = mesh.position.clone();
+function animateMesh(mesh: THREE.Object3D, targetPos: THREE.Vector3, targetRot: THREE.Euler) {
+  const startPos = mesh.position.clone();
+  const startQuat = mesh.quaternion.clone();
+  const endQuat = new THREE.Quaternion().setFromEuler(targetRot);
+  
   const duration = 0.35;
   const startTime = performance.now();
 
@@ -659,7 +770,11 @@ function animateMeshPosition(mesh: THREE.Object3D, target: THREE.Vector3) {
     const elapsed = (performance.now() - startTime) / 1000;
     const t = Math.min(elapsed / duration, 1);
 
-    mesh.position.lerpVectors(start, target, t);
+    // Ease in-out
+    const easedT = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+    mesh.position.lerpVectors(startPos, targetPos, easedT);
+    mesh.quaternion.slerpQuaternions(startQuat, endQuat, easedT);
 
     if (t < 1) requestAnimationFrame(update);
   }
@@ -687,13 +802,16 @@ function animateMeshPosition(mesh: THREE.Object3D, target: THREE.Vector3) {
   .select-button
     margin-left: 16px
 
-  .checkbox-list, .radio-list
+  .checkbox-list, .radio-list, .bare-list
     display: flex
     flex-direction: row
-    flex: 0 0 auto !important    
+    flex: 0 0 auto !important
     width: max-content
     min-width: max-content
     margin-left: 16px
+
+  .bare-list
+    white-space: nowrap
 
   .checkbox-grid
     display: grid
@@ -729,7 +847,7 @@ function animateMeshPosition(mesh: THREE.Object3D, target: THREE.Vector3) {
       margin-bottom: 8px
     .select-button
       margin-left: 8px
-    .checkbox-list, .radio-list
+    .checkbox-list, .radio-list, .bare-list
       width: 100%
       min-width: 0
       flex-direction: column

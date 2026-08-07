@@ -1,104 +1,29 @@
 <template>
   <div class="about">
     <n-flex justify="space-between">
-      <h1 class="pink-text">Educação</h1>
-      <h1 class="blue-text">Outros</h1>
-      <h1 class="white-text">Experiência</h1>
+      <h1 class="pink-text">Education</h1>
+      <h1 class="blue-text">Other</h1>
+      <h1 class="white-text">Experience</h1>
     </n-flex>
     <n-grid y-gap="16" :cols="1">
-      <n-gi class="cv-entry card-left">
+      <n-gi 
+        v-for="(item, index) in cvData" 
+        :key="index"
+        class="cv-entry"
+        :class="getCardClass(item.type)"
+      >
         <CVEntry>
           <template v-slot:header>
-            ISEP - Instituto Superior de Engenharia do Porto         
+            <span v-html="item.title"></span>
           </template>
           <template v-slot:headerExtra>
-            Setembro 2012 - Agosto 2015
+            {{ item.time }}
           </template>
           <template v-slot:description>
-            Licenciatura em Engenharia Electrotécnica
+            {{ item.subtitle }}
           </template>
           <template v-slot:footer>
-            Rua Dr. António Benardino de Almeida, 431 - 4249-015 Porto
-          </template>
-        </CVEntry>
-      </n-gi>
-      <n-gi class="cv-entry card-left">
-        <CVEntry>
-          <template v-slot:header>
-            Curso de Electrónica Avançada - 175 Horas
-          </template>
-          <template v-slot:headerExtra>
-            Julho 2013 - Dezembro 2013
-          </template>
-          <template v-slot:description>
-            ATEC
-          </template>
-          <template v-slot:footer>
-            Edf. Siemens, Av. Mário Brito (EN 107) 3570 - Freixieiro 4455-491 Perafita
-          </template>
-        </CVEntry>
-      </n-gi>
-      <n-gi class="cv-entry card-center">
-        <CVEntry>
-          <template v-slot:header>
-            Voluntariado - Explicador            
-          </template>
-          <template v-slot:headerExtra>
-            Setembro 2016 - 2019
-          </template>
-          <template v-slot:description>
-            Já T'Explico         
-          </template>
-          <template v-slot:footer>
-            Apoio a crianças e jovens do 5º ao 9º ano de escolaridade do distrito do Porto.          
-          </template>
-        </CVEntry>
-      </n-gi>
-      <n-gi class="cv-entry card-right">
-        <CVEntry>
-          <template v-slot:header>
-            Web Developer
-          </template>
-          <template v-slot:headerExtra>
-            Novembro 2017 - Julho 2020
-          </template>
-          <template v-slot:description>
-            Dotlogic - Soluções Informáticas
-          </template>
-          <template v-slot:footer>
-            Desenvolvimento web - <i>frontend</i> - na área médica (cardiologia), alguns projectos de <i>hardware</i>.
-          </template>
-        </CVEntry>
-      </n-gi>
-      <n-gi class="cv-entry card-center">
-        <CVEntry>
-          <template v-slot:header>
-            <i>Make Or Break</i>
-          </template>
-          <template v-slot:headerExtra>
-            8 a 12 - Setembro 2017
-          </template>
-          <template v-slot:description>
-            48 Hour <i>Hackathon</i>     
-          </template>
-          <template v-slot:footer>
-            Parte da equipa vencedora da edição de 2017 do <i>Make Or Break</i> na categoria <i>funny</i>.
-          </template>
-        </CVEntry>
-      </n-gi>
-      <n-gi class="cv-entry card-right">
-        <CVEntry>
-          <template v-slot:header>
-            Web Developer
-          </template>
-          <template v-slot:headerExtra>
-            Agosto 2020 - Presente
-          </template>
-          <template v-slot:description>
-            Fujifilm
-          </template>
-          <template v-slot:footer>
-            Desenvolvimento web - <i>full-stack</i> - na área médica.
+            <span v-html="item.description"></span>
           </template>
         </CVEntry>
       </n-gi>
@@ -108,6 +33,13 @@
 
 <script setup lang="ts">
   import CVEntry from "../components/CVEntry.vue";
+  import { cvData } from "../data/cv";
+
+  function getCardClass(type: string) {
+    if (type === 'Education') return 'card-left';
+    if (type === 'Experience') return 'card-right';
+    return 'card-center';
+  }
 </script>
 
 <style scoped lang="sass">

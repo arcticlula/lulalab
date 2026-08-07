@@ -2,23 +2,18 @@
   <div class="home">
     <router-view></router-view>
 
-    <div v-if="$route.name === 'projects' && activeTags.length > 0" class="filter-container">
-      <n-space align="center">
-        <span>Filtering by:</span>
-        <n-tag
-          v-for="tag in activeTags"
-          :key="tag"
-          type="info"
-          closable
-          @close="removeTagFilter(tag)"
-        >
-          {{ tag }}
-        </n-tag>
-        <n-button text type="error" @click="clearAllFilters">Clear All</n-button>
-      </n-space>
+    <div v-if="$route.name === 'projects'" class="toggle-wrapper">
+      <n-radio-group v-model:value="viewMode" size="medium">
+        <n-radio-button value="grid" title="Grid View">
+          <n-icon size="18" style="vertical-align: middle;"><GridIcon /></n-icon>
+        </n-radio-button>
+        <n-radio-button value="tree" title="Tree View">
+          <n-icon size="18" style="vertical-align: middle;"><TreeIcon /></n-icon>
+        </n-radio-button>
+      </n-radio-group>
     </div>
     
-    <n-grid v-if="$route.name === 'projects'" cols="1 s:2 m:2 l:3" :x-gap="24" :y-gap="24" responsive="screen">
+    <n-grid v-if="$route.name === 'projects' && viewMode === 'grid'" cols="1 s:2 m:2 l:3" :x-gap="24" :y-gap="24" responsive="screen">
       <n-gi v-for="project in displayedProjects" :key="project.name">
         <n-card class="card" hoverable>
           <template #header>
@@ -90,14 +85,110 @@
         </n-card>
       </n-gi>
     </n-grid>
+
+    <div v-if="$route.name === 'projects' && viewMode === 'tree'" class="tree-view-container">
+      <div class="tree-sidebar">
+        <n-tree
+          block-line
+          expand-on-click
+          selectable
+          default-expand-all
+          :data="treeData"
+          @update:selected-keys="handleTreeSelect"
+        />
+      </div>
+      <div class="tree-content">
+        <div 
+          v-for="project in filteredProjects" 
+          :key="project.name" 
+          :id="'project-' + project.name"
+          class="project-details"
+        >
+          <div class="post-date">{{ formatMonthYear(project.date) }}</div>
+          <div class="post-title">{{ project.name }}</div>
+          
+          <div class="project-media-container">
+            <router-link :to="{ name: project.routeName }">
+              <img v-if="project.srcType === 'image'" class="project-media" :src="project.src">
+              <video
+                v-else-if="project.srcType === 'video'"
+                class="project-media"
+                :src="project.src"
+                autoplay
+                loop
+                muted
+                playsinline
+                preload="auto"
+              />
+            </router-link>
+          </div>
+          
+          <div class="card-content project-desc">
+            {{ project.description }}
+          </div>
+          
+          <div class="project-footer">
+            <n-space>
+              <n-tag
+                v-for="keyword in project.keywords"
+                size="small"
+                :key="keyword"
+                class="keyword-tag"
+                :type="activeTags.includes(keyword) ? 'info' : 'success'"
+                :bordered="false"
+                @click="toggleTagFilter(keyword)"
+              >
+                {{ keyword }}
+              </n-tag>
+            </n-space>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sticky filter at the bottom -->
+    <div v-if="$route.name === 'projects'" class="sticky-filter-wrapper">
+      <div class="filter-space glass-pill" v-if="activeTags.length > 0">
+        <n-space align="center">
+          <span>Filtering by:</span>
+          <n-tag
+            v-for="tag in activeTags"
+            :key="tag"
+            type="info"
+            closable
+            @close="removeTagFilter(tag)"
+          >
+            {{ tag }}
+          </n-tag>
+          <n-button text type="error" @click="clearAllFilters">Clear All</n-button>
+        </n-space>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue';
+  import { computed, ref, watch } from 'vue';
+  import { Grid24Regular as GridIcon, TextBulletListTree24Regular as TreeIcon } from '@vicons/fluent';
 
   import { formatMonthYear } from '../utils/date';
   import { projectData, Project } from '../data/projects';
+
+  type ViewMode = 'grid' | 'tree';
+  const viewMode = ref<ViewMode>((localStorage.getItem('viewMode') as ViewMode) || 'grid');
+
+  watch(viewMode, (newMode) => {
+    localStorage.setItem('viewMode', newMode);
+  });
+
+  interface TreeProjectOption {
+    label: string;
+    key: string;
+    isLeaf?: boolean;
+    children?: TreeProjectOption[];
+  }
+
+  const selectedProjectKey = ref<string | null>(null);
 
   const activeTags = ref<string[]>([]);
 
@@ -112,6 +203,50 @@
   const sortedProjects = computed(() => {
     return [...projects.value].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   });
+
+  const treeData = computed(() => {
+    const groups: Record<string, TreeProjectOption[]> = {};
+    filteredProjects.value.forEach(p => {
+      const year = new Date(p.date).getFullYear().toString();
+      if (!groups[year]) {
+        groups[year] = [];
+      }
+      groups[year].push({
+        label: p.name,
+        key: p.name,
+        isLeaf: true
+      });
+    });
+    
+    return Object.keys(groups)
+      .sort((a, b) => Number(b) - Number(a))
+      .map(year => ({
+        label: year,
+        key: `year-${year}`,
+        children: groups[year]
+      }));
+  });
+
+
+
+  function handleTreeSelect(keys: Array<string | number>, option: Array<any>) {
+    if (keys.length > 0) {
+      const selectedOption = option[0];
+      if (selectedOption?.isLeaf) {
+        selectedProjectKey.value = selectedOption.key as string;
+        // Scroll to the specific project element
+        const elementId = `project-${selectedOption.key}`;
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } else {
+        selectedProjectKey.value = null;
+      }
+    } else {
+      selectedProjectKey.value = null;
+    }
+  }
 
   const filteredProjects = computed(() => {
     if (activeTags.value.length === 0) {
@@ -171,10 +306,33 @@ a
   text-decoration: none
   color: inherit
 
-.filter-container
-  margin-bottom: 24px
+.toggle-wrapper
+  display: flex
+  justify-content: flex-end
+  width: 100%
+  margin-bottom: 16px
+  position: relative
+  z-index: 10
+
+.sticky-filter-wrapper
+  position: sticky
+  bottom: 24px
+  z-index: 100
+  pointer-events: none
   display: flex
   justify-content: center
+  margin-top: 24px
+
+.filter-space
+  pointer-events: auto
+  display: inline-block
+
+.glass-pill
+  background: rgba(0, 0, 0, 0.4)
+  backdrop-filter: blur(10px)
+  padding: 8px 16px
+  border-radius: 8px
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2)
 
 .keyword-tag
   cursor: pointer
@@ -209,4 +367,86 @@ a
 .card-date
   font-size: 0.9em
   color: #888
+
+.tree-view-container
+  display: flex
+  flex-direction: row
+  gap: 32px
+  max-width: 1200px
+  margin: 0 auto
+  padding: 24px
+  padding-top: 0
+  align-items: flex-start
+  @media (max-width: 768px)
+    padding: 12px
+    padding-top: 0
+    flex-direction: column
+    margin: 0
+    
+.tree-sidebar
+  flex: 0 0 250px
+  background: var(--n-color-modal, rgba(0, 0, 0, 0.02))
+  padding: 16px
+  padding-top: 0
+  border-radius: 8px
+  position: sticky
+  top: 24px
+  height: max-content
+  max-height: calc(100vh - 48px)
+  overflow-y: auto
+  @media (max-width: 768px)
+    flex: none
+    width: 100%
+    position: static
+    
+.tree-content
+  flex: 1
+  min-width: 0
+
+.project-details
+  padding: 16px 0
+  margin-bottom: 64px
+  border-bottom: 1px solid var(--n-border-color, rgba(0, 0, 0, 0.1))
+  &:last-child
+    border-bottom: none
+    margin-bottom: 32px
+
+.post-date
+  font-weight: 600
+  font-size: 1.1em
+  opacity: 0.7
+  margin-bottom: 8px
+
+.post-title
+  font-size: 2em
+  font-weight: bold
+  margin-bottom: 24px
+  line-height: 1.2
+
+.project-media
+  width: 100%
+  max-height: 600px
+  object-fit: cover
+  border-radius: 8px
+  cursor: pointer
+  margin-bottom: 24px
+  transition: transform 0.2s ease
+  &:hover
+    transform: scale(1.01)
+
+.project-desc
+  font-size: 1.1em
+  line-height: 1.6
+  opacity: 0.9
+  margin-bottom: 24px
+
+.project-footer
+  margin-top: 16px
+
+.empty-selection
+  display: flex
+  justify-content: center
+  align-items: center
+  height: 400px
+  opacity: 0.7
 </style>

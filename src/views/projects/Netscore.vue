@@ -3,40 +3,61 @@
     <n-p class="squid-semi-title">The Story</n-p>
     <n-p>
       NetScore is a scoreboard system designed to track game scores in real time using one or more Bluetooth buttons. 
-      Each button can be assigned to increase the home or away score, making it easy for players or referees to update the display wirelessly. 
+      Each button can be assigned to increase the home or away score, making it easy for players/anyone to update the display wirelessly. 
       The system runs (for now) on an ESP32-S2 and drives 3 pairs of multiplexed 7-segment displays, showing both points and sets. 
       To ensure the score is visible from both sides of the court, the displays are mirrored on a back-to-back board.
     </n-p>
     <n-p>
       Originally, the plan was to increment the score directly on the device itself - it's mounted on the net, so anyone nearby could press a button to update it. 
-      After some feedback from friends, it became clear that external BLE buttons would be a better approach. That’s when I hit a snag: the ESP32-S2 lacks native Bluetooth. 
-      Instead of starting over, I added a separate ESP32 to act as a "Bluetooth hub." This ESP32 handles all Bluetooth input and forwards events to the ESP32-S2 controller via ESP-NOW -
+      After some feedback from my friends, it became clear that external BLE buttons would be a better approach. That's where I hit a snag: the ESP32-S2 lacks native Bluetooth. 
+      Instead of starting over right away, I added a separate ESP32 to act as a "Bluetooth hub." This ESP32 handles all Bluetooth input and forwards events to the ESP32-S2 controller via ESP-NOW -
       a proprietary peer-to-peer communication protocol. Some of the structural ideas were inherited from <router-link :to="{ name: 'goalie-rotation-timer' }"><n-a>Goalie Rotation Timer</n-a></router-link>, 
       and I plan to merge both concepts - scoring and timed rotations, for football - in a future version.
     </n-p>
+    
+    <n-p class="squid-semi-title">Scoreboard Simulation</n-p>
+    <n-p>Press the buttons in the remotes to navigate and hold to enter the menus.</n-p>
+    <iframe src="netscore/component/index.html" class="netscore-iframe" loading="lazy"></iframe>
+    
     <n-p class="squid-semi-title">Key Features</n-p>
     <n-ul>
-      <n-li>Real-time score updates via Bluetooth Classic buttons.</n-li>
+      <n-li>Real-time score updates via cheap off-the-shelf BLE buttons (HID over GATT) - AB Shutter camera remotes (1 and 2 button models) and iTAG keyfinders, more than one can be paired at a time.</n-li>
       <n-li>Displays both points and sets for home and away teams.</n-li>
-      <n-li>Six multiplexed 7-segment displays controlled by TLC5926 constant-current drivers.</n-li>
+      <n-li>Six multiplexed 7-segment displays controlled by a TLC5940 constant-current driver.</n-li>
       <n-li>Unique dual-MCU architecture communicating via ESP-NOW.</n-li>
     </n-ul>
     <n-p class="squid-semi-title">Tech Stack</n-p>
     <n-ul>
-      <n-li>Controller: <span class="squid-text-alt">ESP32-S2</span></n-li>
+      <n-li>Controller: <span class="squid-text-alt">ESP32-S2-WROVER-I</span></n-li>
       <n-li>Bluetooth Hub: <span class="squid-text-alt">ESP32</span></n-li>
-      <n-li>Wireless Protocols: <span class="squid-text-alt">ESP-NOW, Bluetooth Classic</span></n-li>
-      <n-li>Display Drivers: <span class="squid-text-alt">TLC5926 Constant-Current LED Drivers</span></n-li>
-      <n-li>Sound: <span class="squid-text-alt">Passive Buzzer</span></n-li>
+      <n-li>Wireless Protocols: <span class="squid-text-alt">ESP-NOW, BLE</span></n-li>
+      <n-li>Display Drivers: <span class="squid-text-alt">TLC5940 Constant-Current LED Driver + 3 MOSFETs (for multiplexing the 7-segment displays) </span></n-li>
+      <n-li>Sound: <span class="squid-text-alt">Passive Buzzer, driven directly from a GPIO through a small FET</span></n-li>
+      <n-li>Power: <span class="squid-text-alt">1S Li-ion, TP4056 charger + FS312MH protection + AP2112K-3.3 LDO</span></n-li>
+      <n-li>Ambient Light: <span class="squid-text-alt">BH1750FVI for automatic brightness - designed in, but never actually soldered: it ended up somewhere on the board where it couldn't see anything useful</span></n-li>
       <n-li>Programming: <span class="squid-text-alt">C/C++ (ESP-IDF)</span></n-li>
     </n-ul>
     <n-p class="squid-semi-title">Challenges & Lessons Learned</n-p>
     <n-p>
       The primary challenge was discovering that my chosen main controller, the ESP32-S2, did not support Bluetooth 
       after the hardware was already designed. This led to a creative workaround: implementing a two-chip solution. 
-      This experience was a valuable lesson in hardware specification and adaptability, forcing me to learn and implement 
-      ESP-NOW as a robust communication bridge between two microcontrollers. It demonstrated how to salvage a design 
-      by augmenting it rather than starting from scratch.
+      This experience was actually a good lesson in adaptability, forcing me to learn and implement
+      ESP-NOW as a robust communication bridge between two microcontrollers - which i'm using right now to mirror the display to another board.
+      It also demonstrated how to salvage a design by augmenting it rather than starting from scratch.
+    </n-p>
+    <n-p>
+      The bluetooth thing was the headline bug, but this board collected a few more that were only found after assembly. The USB data lines were swapped and needed bodge wires to
+      program it at all - and they weren't routed as a differential pair either, that only got done properly from V2 onwards. The battery protection was miswired with BAT- tied
+      straight to GND instead of the FS312's sense pin, which quietly defeats the whole protection circuit, and a couple of strapping pins were missing pullups or reused for
+      functions that fight the boot mode. The buzzer was far too quiet: a piezo's loudness scales with drive voltage and driving it straight off a 3.3V GPIO gives you nowhere
+      near what the element wants, which is something no amount of firmware can fix. And the power button circuit was just plain finnicky - sometimes it turned the MCU on by
+      itself, sometimes it wouldn't turn it on at all.
+    </n-p>
+    <n-p>
+      The one that annoyed me most day to day wasn't electrical though. The buttons were soldered onto the edges of the display boards, one on each side, which meant two things:
+      you had to take the whole thing apart to get at anything, and you were forced to run both display sides even if you only wanted one, because otherwise half the buttons
+      simply weren't there. That's the constraint that pushed the buttons off the device entirely and onto the BLE remotes, and it's why
+      <router-link :to="{ name: 'netscore-v2' }"><n-a>V2</n-a></router-link> made a single display panel a valid configuration.
     </n-p>
     <n-p class="squid-semi-title">Links</n-p>
     <n-ul>
@@ -53,71 +74,20 @@ import ProjectTemplate from '../../components/ProjectTemplate.vue';
 import { IMedia, ICascadeCategory } from '../../models/media';
 
 const media = ref<IMedia[]>([
-  {
-    type: 'video',
-    src: 'netscore/videos/PXL_20250301_000010858.mp4',
-    description: "first time testing all the boards together + ESP-32 Hub"
-  },
-  {
-    type: 'video',
-    src: 'netscore/videos/PXL_20241117_223828664.mp4',
-    description: "testing the display board"
-  },
-  {
-    type: 'video',
-    src: 'netscore/videos/PXL_20250205_191319538.mp4',
-    description: "showing different modes (volleyball, ping pong, and padel for now)"
-  },
-  {
-    type: 'image',
-    src: 'netscore/images/PXL_20241106_210348109.jpg',
-    description: "early build to test the TLC5926 and two multiplexed segments"
-  },
-  {
-    type: 'video',
-    src: 'netscore/videos/PXL_20241107_190212057.mp4'
-  },
-  {
-    type: 'image',
-    src: 'netscore/images/IMG-20241108-WA0001.jpeg'
-  },
-  {
-    type: 'image',
-    src: 'netscore/images/PXL_20241114_132224068.jpg'
-  },
-  {
-    type: 'image',
-    src: 'netscore/images/PXL_20241114_161855706.jpg'
-  },
-  {
-    type: 'image',
-    src: 'netscore/images/PXL_20241222_193515647.jpg',
-    description: "battery assembly"
-  },
-  {
-    type: 'image',
-    src: 'netscore/images/PXL_20241226_180411652.jpg',
-    description: "showing display holder's heat fitted threads"
-  },
-  {
-    type: 'image',
-    src: 'netscore/images/PXL_20250108_142958239.jpg'
-  },
-  {
-    type: 'image',
-    src: 'netscore/images/PXL_20250207_171005662.jpg',
-    description: "that time I couldn't program it via usb-c"
-  },
-  {
-    type: 'image',
-    src: 'netscore/images/PXL_20250428_131037974.jpg',
-    description: "trying to make a build with an esp-32 before making a new revision"
-  },
-  {
-    type: 'video',
-    src: 'netscore/videos/PXL_20250304_154156214.mp4',
-    description: "had to tape it down since TPU likes to peel from the plate"
-  },
+  { type: 'video', src: 'netscore/videos/PXL_20250301_000010858.mp4', description: "first time testing all the boards together + ESP32 Hub" },
+  { type: 'video', src: 'netscore/videos/PXL_20241117_223828664.mp4', description: "testing the display board" },
+  { type: 'video', src: 'netscore/videos/PXL_20250205_191319538.mp4', description: "showing different modes (volleyball, ping pong, and padel for now)" },
+  { type: 'image', src: 'netscore/images/PXL_20241106_210348109.jpg', description: "early build to test the TLC5926 and two multiplexed segments" },
+  { type: 'video', src: 'netscore/videos/PXL_20241107_190212057.mp4' },
+  { type: 'image', src: 'netscore/images/IMG-20241108-WA0001.jpg' },
+  { type: 'image', src: 'netscore/images/PXL_20241114_132224068.jpg' },
+  { type: 'image', src: 'netscore/images/PXL_20241114_161855706.jpg' },
+  { type: 'image', src: 'netscore/images/PXL_20241222_193515647.jpg', description: "battery assembly" },
+  { type: 'image', src: 'netscore/images/PXL_20241226_180411652.jpg', description: "showing display holder's heat fitted threads" },
+  { type: 'image', src: 'netscore/images/PXL_20250108_142958239.jpg' },
+  { type: 'image', src: 'netscore/images/PXL_20250207_171005662.jpg', description: "that time I couldn't program it via usb-c" },
+  { type: 'image', src: 'netscore/images/PXL_20250428_131037974.jpg', description: "trying to make a build with an esp32 before making a new revision" },
+  { type: 'video', src: 'netscore/videos/PXL_20250304_154156214.mp4', description: "had to tape it down since TPU likes to peel from the plate" }
 ]);
 
   const models = ref<ICascadeCategory[]>([
@@ -130,14 +100,78 @@ const media = ref<IMedia[]>([
           label: 'Display Board',
           children: [
             { key: 'ns-display-board-v1.0', label: '1.0', src: 'netscore/models/pcb/display-board-v1.0.wrl'},
-            { key: 'ns-display-board-v1.2', label: '1.2', src: 'netscore/models/pcb/display-board-v1.2.wrl'}
+            { key: 'ns-display-board-v1.2', label: '1.2', src: 'netscore/models/pcb/display-board-v1.2.wrl', bareSrc: 'netscore/models/pcb/display-board-v1.2-bare.wrl'}
           ]
         },
         {
           key: 'ns-main-board',
           label: 'Main Board',
           children: [
-            { key: 'ns-main-board-v1.0', label: '1.0', src: 'netscore/models/pcb/main-board-v1.0.wrl'}
+            { key: 'ns-main-board-v1.0', label: '1.0', src: 'netscore/models/pcb/main-board-v1.0.wrl', bareSrc: 'netscore/models/pcb/main-board-v1.0-bare.wrl'}
+          ]
+        }
+      ]
+    },
+        {
+      key: 'ns-assembly',
+      label: 'Assembly',
+      children: [
+        {
+          key: 'ns-assembly-v1.5',
+          label: 'v1.5',
+          children: [
+            {
+              key: 'ns-v1.5',
+              label: 'Full Assembly',
+              isGroup: true,
+              children: [
+                { key: 'ns-handle-v1.5', label: 'Handle', src: 'netscore/models/assembly/v1.5/assembly-handle-v1.5.stl', colorHex: '0xf9e1a8', explodeOffset: {x: 0, y: 0, z: 20}},
+                { key: 'ns-top-v1.5', label: 'Top', src: 'netscore/models/assembly/v1.5/assembly-top-v1.5.stl', colorHex: '0xff7f00', explodeOffset: {x: 0, y: 0, z: 10}},
+                { key: 'ns-button-v1.5', label: 'Button', src: 'netscore/models/assembly/v1.5/assembly-btn-v1.5.stl', colorHex: '0xd6e5bd', explodeOffset: {x: 0, y: 0, z: 15}},
+                { key: 'ns-bottom-v1.5', label: 'Bottom', src: 'netscore/models/assembly/v1.5/assembly-bottom-v1.5.stl', colorHex: '0xff7f00', explodeOffset: {x: 0, y: 0, z: -15}},
+                { key: 'ns-body-v1.5', label: 'Body', src: 'netscore/models/assembly/v1.5/assembly-inner-body-v1.5.stl', colorHex: '0xbcd8ec', explodeOffset: {x: 0, y: 0, z: 0}},
+                { key: 'ns-body-spacer-v1.5', label: 'Body spacer', src: 'netscore/models/assembly/v1.5/assembly-inner-body-spacer-v1.5.stl', colorHex: '0xf9e1a8', explodeOffset: {x: 0, y: 0, z: 3}}
+              ]
+            }
+          ]
+        },
+        {
+          key: 'ns-assembly-v1.0',
+          label: 'v1.0',
+          children: [
+            {
+              key: 'ns-v1.0',
+              label: 'Full Assembly',
+              isGroup: true,
+              children: [
+                { key: 'ns-handle-v1.0', label: 'Handle', src: 'netscore/models/assembly/v1.0/assembly-handle-v1.0.stl', colorHex: '0xf9e1a8', explodeOffset: {x: 0, y: 0, z: 20}},
+                { key: 'ns-top-v1.0', label: 'Top', src: 'netscore/models/assembly/v1.0/assembly-top-v1.0.stl', colorHex: '0xff7f00', explodeOffset: {x: 0, y: 0, z: 10}},
+                { key: 'ns-button-v1.0', label: 'Button', src: 'netscore/models/assembly/v1.0/assembly-btn-v1.0.stl', colorHex: '0xd6e5bd', explodeOffset: {x: 0, y: 0, z: 15}},
+                { key: 'ns-bottom-v1.0', label: 'Bottom', src: 'netscore/models/assembly/v1.0/assembly-bottom-v1.0.stl', colorHex: '0xff7f00', explodeOffset: {x: 0, y: 0, z: -15}},
+                { key: 'ns-body-front-v1.0', label: 'Body front', src: 'netscore/models/assembly/v1.0/assembly-inner-body-front-v1.0.stl', colorHex: '0xbcd8ec', explodeOffset: {x: 0, y: -10, z: 0}},
+                { key: 'ns-body-back-v1.0', label: 'Body back', src: 'netscore/models/assembly/v1.0/assembly-inner-body-back-v1.0.stl', colorHex: '0xbcd8ec', explodeOffset: {x: 0, y: 10, z: 0}},
+                { key: 'ns-body-union-v1.0', label: 'Body union', src: 'netscore/models/assembly/v1.0/assembly-inner-body-union-v1.0.stl', colorHex: '0xdcccec', explodeOffset: {x: 0, y: 0, z: -4}},
+                { key: 'ns-body-spacer-v1.0', label: 'Body spacer', src: 'netscore/models/assembly/v1.0/assembly-inner-body-spacer-v1.0.stl', colorHex: '0xf9e1a8', explodeOffset: {x: 0, y: 0, z: 3}}
+              ]
+            }
+          ]
+        },
+        {
+          key: 'ns-assembly-prototype',
+          label: 'Prototype',
+          children: [
+            {
+              key: 'ns-prototype-v0.99',
+              label: 'v0.99',
+              isGroup: true,
+              children: [
+                { key: 'ns-handle-v0.99', label: 'Handle', src: 'netscore/models/assembly/prototype/assembly-handle-v0.99.stl', colorHex: '0xf9e1a8', explodeOffset: {x: 0, y: 0, z: 20}},
+                { key: 'ns-top-v0.99', label: 'Top', src: 'netscore/models/assembly/prototype/assembly-top-v0.99.stl', colorHex: '0xff7f00', explodeOffset: {x: 0, y: 0, z: 10}},
+                { key: 'ns-button-v0.99', label: 'Button', src: 'netscore/models/assembly/prototype/assembly-btn-v0.99.stl', colorHex: '0x00ff00', explodeOffset: {x: 0, y: 0, z: 15}},
+                { key: 'ns-middle-v0.99', label: 'Middle', src: 'netscore/models/assembly/prototype/assembly-middle-v0.99.stl', colorHex: '0xff7f00', explodeOffset: {x: 0, y: 0, z: 0}},
+                { key: 'ns-bottom-v0.99', label: 'Bottom', src: 'netscore/models/assembly/prototype/assembly-bottom-v0.99.stl', colorHex: '0xff7f00', explodeOffset: {x: 0, y: 0, z: -10}}
+              ]
+            }
           ]
         }
       ]
@@ -215,55 +249,19 @@ const media = ref<IMedia[]>([
           ]
         }
       ]
-    },
-    {
-      key: 'ns-assembly',
-      label: 'Assembly',
-      children: [
-        {
-          key: 'ns-assembly-prototype',
-          label: 'Prototype',
-          children: [
-            {
-              key: 'ns-prototype-v0.99',
-              label: 'v0.99',
-              isGroup: true,
-              children: [
-                { key: 'ns-handle-v0.99', label: 'Handle', src: 'netscore/models/assembly/prototype/assembly-handle-v0.99.stl', colorHex: '0xf9e1a8', explodeOffset: {x: 0, y: 0, z: 20}},
-                { key: 'ns-top-v0.99', label: 'Top', src: 'netscore/models/assembly/prototype/assembly-top-v0.99.stl', colorHex: '0xff7f00', explodeOffset: {x: 0, y: 0, z: 10}},
-                { key: 'ns-button-v0.99', label: 'Button', src: 'netscore/models/assembly/prototype/assembly-btn-v0.99.stl', colorHex: '0x00ff00', explodeOffset: {x: 0, y: 0, z: 15}},
-                { key: 'ns-middle-v0.99', label: 'Middle', src: 'netscore/models/assembly/prototype/assembly-middle-v0.99.stl', colorHex: '0xff7f00', explodeOffset: {x: 0, y: 0, z: 0}},
-                { key: 'ns-bottom-v0.99', label: 'Bottom', src: 'netscore/models/assembly/prototype/assembly-bottom-v0.99.stl', colorHex: '0xff7f00', explodeOffset: {x: 0, y: 0, z: -10}}
-              ]
-            }
-          ]
-        },
-        {
-          key: 'ns-assembly-v1.0',
-          label: 'v1.0',
-          children: [
-            {
-              key: 'ns-v1.0',
-              label: 'Full Assembly',
-              isGroup: true,
-              children: [
-                { key: 'ns-handle-v1.0', label: 'Handle', src: 'netscore/models/assembly/v1.0/assembly-handle-v1.0.stl', colorHex: '0xf9e1a8', explodeOffset: {x: 0, y: 0, z: 20}},
-                { key: 'ns-top-v1.0', label: 'Top', src: 'netscore/models/assembly/v1.0/assembly-top-v1.0.stl', colorHex: '0xff7f00', explodeOffset: {x: 0, y: 0, z: 10}},
-                { key: 'ns-button-v1.0', label: 'Button', src: 'netscore/models/assembly/v1.0/assembly-btn-v1.0.stl', colorHex: '0xd6e5bd', explodeOffset: {x: 0, y: 0, z: 15}},
-                { key: 'ns-bottom-v1.0', label: 'Bottom', src: 'netscore/models/assembly/v1.0/assembly-bottom-v1.0.stl', colorHex: '0xff7f00', explodeOffset: {x: 0, y: 0, z: -15}},
-                { key: 'ns-body-front-v1.0', label: 'Body front', src: 'netscore/models/assembly/v1.0/assembly-inner-body-front-v1.0.stl', colorHex: '0xbcd8ec', explodeOffset: {x: 0, y: -10, z: 0}},
-                { key: 'ns-body-back-v1.0', label: 'Body back', src: 'netscore/models/assembly/v1.0/assembly-inner-body-back-v1.0.stl', colorHex: '0xbcd8ec', explodeOffset: {x: 0, y: 10, z: 0}},
-                { key: 'ns-body-union-v1.0', label: 'Body union', src: 'netscore/models/assembly/v1.0/assembly-inner-body-union-v1.0.stl', colorHex: '0xdcccec', explodeOffset: {x: 0, y: 0, z: -4}},
-                { key: 'ns-body-spacer-v1.0', label: 'Body spacer', src: 'netscore/models/assembly/v1.0/assembly-inner-body-spacer-v1.0.stl', colorHex: '0xf9e1a8', explodeOffset: {x: 0, y: 0, z: 3}}
-              ]
-            }
-          ]
-        }
-      ]
     }
   ]);
 </script>
 
 <style scoped lang="sass">
+.netscore-iframe 
+  width: 100%
+  height: 480px
+  border: none
+  margin-top: 16px
 
+
+@media (max-width: 768px) 
+  .netscore-iframe
+    height: 260px
 </style>

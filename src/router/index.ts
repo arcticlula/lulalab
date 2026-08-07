@@ -67,6 +67,18 @@ const routes: Array<RouteRecordRaw> = [
         meta: { background: 'black' }
       },
       {
+        path: 'netscore-v2',
+        name: 'netscore-v2',
+        component: () => import("../views/projects/NetscoreV2.vue"),
+        meta: { background: 'black' }
+      },
+      {
+        path: 'netscore-v3',
+        name: 'netscore-v3',
+        component: () => import("../views/projects/NetscoreV3.vue"),
+        meta: { background: 'black' }
+      },
+      {
         path: 'comando-rita',
         name: 'comando-rita',
         component: () => import("../views/projects/ComandoRita.vue"),
@@ -117,9 +129,17 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
+    path: "/logs",
+    name: "logs",
+    component: () => import("../views/Logs.vue"),
+    meta: {
+      background: 'crosshatch'
+    }
+  },
+  {
     path: "/cv",
     name: "cv",
-    component: () => import("../views/CV.vue"),
+    component: () => import("../views/CVWrapper.vue"),
     meta: {
       background: 'cv'
     }
@@ -137,6 +157,14 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    console.log(to, from, savedPosition);
+    if (savedPosition) {
+      return savedPosition;
+    } else {
+      return { top: 0 };
+    }
+  }
 });
 
 export default router;

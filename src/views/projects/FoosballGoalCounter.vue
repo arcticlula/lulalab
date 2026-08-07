@@ -2,31 +2,41 @@
   <ProjectTemplate id="foosball-goal-counter" :media="media" :models="models">
     <n-p class="squid-semi-title">The Story</n-p>
     <n-p>
-      This prototype was built to automatically record foosball goals without human input. The idea: guide the ball over a sensing "bridge" after each goal using a low-friction ramp, detect passage, then update and display the score in real time. I iterated through multiple mechanical versions to get reliable ball travel and sensor triggering while keeping the structure compact and printable.
+      Sometime after I started working at Fujifilm, they got a foosball table for the office. 
+      After a few games and some shoddy manual scorekeeping, I decided to build an automated goal counter. 
+      I placed two sensors inside the table — one on each internal return ramp. 
+      This setup ensures a goal is only counted if the ball fully enters the goal and rolls down the ramp. 
+      While it introduces a slight delay before the score updates, it perfectly protects the sensors from hard shots 
+      ("estouros") and prevents false positives from balls that bounce in and right back out.
     </n-p>
+
     <n-p class="squid-semi-title">Key Features</n-p>
     <n-ul>
-      <n-li>Automated Detection: <span class="squid-text-alt">Ramp + bridge assembly channels the ball through a sensor region after every goal.</span></n-li>
-      <n-li>Real-Time Scoring: <span class="squid-text-alt">Microcontroller logic updates and persists scores instantly.</span></n-li>
-      <n-li>Modular Printed Parts: <span class="squid-text-alt">Separate ramp, case, and bridge components iterated across versions.</span></n-li>
-      <n-li>Compact Electronics Bay: <span class="squid-text-alt">Internal area for controller and wiring.</span></n-li>
-      <n-li>Progressive Mechanical Refinement: <span class="squid-text-alt">Multiple geometry tweaks for ball guidance consistency.</span></n-li>
+      <n-li>Reliable Goal Detection: <span class="squid-text-alt">Uses sensors mounted on the internal return ramps to prevent false positives from bounce-outs and protect the hardware from direct ball impacts.</span></n-li>
+      <n-li>Interactive Display: <span class="squid-text-alt">Features a screen and a 3-button control system (two for navigating, one to confirm) to manage the game.</span></n-li>
+      <n-li>Buzzer: <span class="squid-text-alt">The device makes a noise every time a goal is scored - always a good thing to have.</span></n-li>
+      <n-li>Iconic Goal Animations: <span class="squid-text-alt">Whenever a goal is scored, the display plays a random GIF animation based on real, iconic soccer goals.</span></n-li>
     </n-ul>
+
     <n-p class="squid-semi-title">Tech Stack</n-p>
     <n-ul>
-      <n-li>Mechanical: <span class="squid-text-alt">Custom 3D printed ramp, bridge, and enclosure parts.</span></n-li>
-      <n-li>Electronics: <span class="squid-text-alt">Microcontroller + discrete sensing (future IR / hall expansion).</span></n-li>
-      <n-li>Fabrication: <span class="squid-text-alt">FDM 3D printing with iterative CAD changes.</span></n-li>
-      <n-li>Interface: <span class="squid-text-alt">Intended web/app display (prototype stage).</span></n-li>
+      <n-li>Sensors: <span class="squid-text-alt">Infrared (IR) sensors.</span></n-li>
+      <n-li>Hardware: <span class="squid-text-alt">Raspberry Pi Pico (RP2040) devboard with a display and buttons, plus an accessory board that links the two sensors to the main board.</span></n-li>
     </n-ul>
+
     <n-p class="squid-semi-title">Challenges & Lessons Learned</n-p>
     <n-p>
-      Achieving consistent ball travel required tuning surface angle, wall clearances, and entry alignment. Small geometry changes (like lip height or ramp curvature) had large effects on whether the ball would stall. Future improvements would integrate fully enclosed sensing and wireless score broadcast. Mechanical repeatability matters just as much as electronics for reliability.
+      The initial design used ultrasonic sensors to detect the ball, but I realized that was overly complex since the system didn't actually need to measure distance. 
+      I switched to infrared sensors for their simplicity and reliability in just detecting whether the ball passed by the ramp. 
+      Additionally, figuring out the physical sensor placement was a great lesson - mounting them in the return ramp safely solved the durability and false-positive issues.
     </n-p>
     <n-p class="squid-semi-title">Links</n-p>
     <n-ul>
-      <n-li><n-a href="toDo" target="_blank">[GitHub Repository]</n-a></n-li>
+      <n-li><n-a href="https://github.com/arcticlula/Foosball-Goal-Counter" target="_blank">[GitHub Repository]</n-a></n-li>
+      <n-li><n-a href="https://cad.onshape.com/documents/4683c4b6d39de78bfc648ef6/w/2488d772c582580a413f5cf2/e/75c2e6e559e4e5faf6c7c454?renderMode=0&uiState=69f2ad9414aa3d1eb141742e" target="_blank">[Onshape - v0.5]</n-a></n-li>
+      <n-li><n-a href="https://cad.onshape.com/documents/d4462fdf167e8bc97f4330b3/w/6413723d704b0ad613a4c582/e/822169a04f2c1a64f55fee10?renderMode=0&uiState=69f2adfcfb150cc2bdaa798c" target="_blank">[Onshape - v2.0]</n-a></n-li>
     </n-ul>
+
   </ProjectTemplate>
 </template>
 
@@ -36,14 +46,76 @@ import ProjectTemplate from '../../components/ProjectTemplate.vue';
 import { IMedia, ICascadeCategory } from '../../models/media';
 
 const media = ref<IMedia[]>([
-  { type: 'video', src: 'foosball-goal-counter/videos/PXL_20230815_223158959.mp4', description: 'goal detection ramp test' },
-  { type: 'video', src: 'foosball-goal-counter/videos/PXL_20230821_214233713.mp4', description: 'bridge sensor activation sequence' },
-  { type: 'image', src: 'foosball-goal-counter/images/PXL_20230815_205930926.jpg', description: 'enclosure and ramp iteration' },
-  { type: 'image', src: 'foosball-goal-counter/images/PXL_20230816_195004995.jpg', description: 'internal wiring layout' },
-  { type: 'image', src: 'foosball-goal-counter/images/PXL_20230821_213421130.jpg', description: 'bridge component closeup' },
+  { type: 'video', src: 'foosball-goal-counter/videos/demo.mp4', description: 'demo of the completed device in action' },
+  { type: 'video', src: 'foosball-goal-counter/videos/early-sensor-test.mp4', description: 'early sensor test - using the ultrasonic sensors instead of IR' },
+  { type: 'image', src: 'foosball-goal-counter/images/IMG_20210408_112702.jpg', description: 'first sensor assembly' },
+  { type: 'image', src: 'foosball-goal-counter/images/IMG-20210415-WA0016.jpg', description: 'breadboarded version' },
+  { type: 'image', src: 'foosball-goal-counter/images/back-combined.jpg', description: 'prototype back' },
+  { type: 'image', src: 'foosball-goal-counter/images/front-combined.jpg', description: 'prototype front' },
+  { type: 'image', src: 'foosball-goal-counter/images/close-ups.jpg', description: 'prototype close ups' },
+  { type: 'image', src: 'foosball-goal-counter/images/ramp-final-combined.jpg', description: 'final ramp design' },
+  { type: 'image', src: 'foosball-goal-counter/images/PXL_20230815_211846080.jpg', description: 'the whole assembly (no enclosure)' },
+  { type: 'image', src: 'foosball-goal-counter/images/device-combined.jpg', description: 'final device - messy but functional' },
+  { type: 'image', src: 'foosball-goal-counter/images/DSC_0897.jpg', description: 'one more shot of the assembled device dissasembled' },
+  { type: 'image', src: 'foosball-goal-counter/images/mistake-combined.jpg', description: 'mistake i can\'t quite remember now' },
+  { type: 'video', src: 'foosball-goal-counter/videos/mistake.mp4', description: 'it happens' },
 ]);
 
 const models = ref<ICascadeCategory[]>([
+  {
+    key: 'fgc-assembly',
+    label: 'Assembly',
+    children: [
+      {
+        key: 'fgc-assembly-enclosure',
+        label: 'Enclosure',
+        children: [
+          {
+            key: 'fgc-assembly-enclosure-v1.0',
+            label: 'v1.0',
+            isGroup: true,
+            children: [
+              { key: 'fgc-enclosure-bottom', label: 'Bottom', src: 'foosball-goal-counter/models/assembly/enclosure/matrecos-bottom.stl', colorHex: '0xff8800', explodeOffset: {x: 0, y: 0, z: -10} },
+              { key: 'fgc-enclosure-top', label: 'Top', src: 'foosball-goal-counter/models/assembly/enclosure/matrecos-top.stl', colorHex: '0x00b7bd', explodeOffset: {x: 0, y: 0, z: 10} },
+            ]
+          }
+        ]
+      },
+            {
+        key: 'fgc-ramp-assembly-v2.2',
+        label: 'Ramp v2.2',
+        children: [
+          {
+            key: 'fgc-assembly-ramp-v2.2',
+            label: 'v2.2',
+            isGroup: true,
+            children: [
+              { key: 'fgc-ramp-assembly-v2.2-ramp-l', label: 'Left Ramp', src: 'foosball-goal-counter/models/assembly/ramp/v2.2/matrecos-ramp-l.stl', colorHex: '0x253fa6', explodeOffset: {x: 0, y: 0, z: 0} },
+              { key: 'fgc-ramp-assembly-v2.2-bridge', label: 'Bridge', src: 'foosball-goal-counter/models/assembly/ramp/v2.2/matrecos-bridge.stl', colorHex: '0x00aa55', explodeOffset: {x: 0, y: 0, z: 25} },
+              { key: 'fgc-ramp-assembly-v2.2-ramp-r', label: 'Right Ramp', src: 'foosball-goal-counter/models/assembly/ramp/v2.2/matrecos-ramp-r.stl', colorHex: '0x253fa6', explodeOffset: {x: 0, y: 0, z: 0} }
+            ]
+          }
+        ]
+      },
+      {
+        key: 'fgc-ramp-assembly-v0.5',
+        label: 'Ramp v0.5',
+        children: [
+          {
+            key: 'fgc-assembly-ramp-v0.5',
+            label: 'v0.5',
+            isGroup: true,
+            children: [
+              { key: 'fgc-ramp-assembly-v0.5-ramp-l', label: 'Left Ramp', src: 'foosball-goal-counter/models/assembly/ramp/v0.5/matrecos-ramp-l.stl', colorHex: '0x2f5ee6', explodeOffset: {x: -30, y: 0, z: 0} },
+              { key: 'fgc-ramp-assembly-v0.5-core-l', label: 'Left Core', src: 'foosball-goal-counter/models/assembly/ramp/v0.5/matrecos-core-l.stl', colorHex: '0x3366ff', explodeOffset: {x: -15, y: 0, z: 0} },
+              { key: 'fgc-ramp-assembly-v0.5-core-r', label: 'Right Core', src: 'foosball-goal-counter/models/assembly/ramp/v0.5/matrecos-core-r.stl', colorHex: '0x3366ff', explodeOffset: {x: 15, y: 0, z: 0} },
+              { key: 'fgc-ramp-assembly-v0.5-ramp-r', label: 'Right Ramp', src: 'foosball-goal-counter/models/assembly/ramp/v0.5/matrecos-ramp-r.stl', colorHex: '0x2f5ee6', explodeOffset: {x: 30, y: 0, z: 0} }
+            ]
+          }
+        ]
+      }
+    ]
+  },
   {
     key: 'fgc-enclosure',
     label: 'Enclosure',
@@ -94,60 +166,6 @@ const models = ref<ICascadeCategory[]>([
           { key: 'fgc-bridge-v2.2', label: 'v2.2', src: 'foosball-goal-counter/models/bridge/matrecos-bridge-v2.2.stl', colorHex: '0x00aa55' },
           { key: 'fgc-bridge-v2.3', label: 'v2.3', src: 'foosball-goal-counter/models/bridge/matrecos-bridge-v2.3.stl', colorHex: '0x00994d' },
           { key: 'fgc-bridge-v2.4', label: 'v2.4', src: 'foosball-goal-counter/models/bridge/matrecos-bridge-v2.4.stl', colorHex: '0x008f48' },
-        ]
-      }
-    ]
-  },
-  {
-    key: 'fgc-assembly',
-    label: 'Assembly',
-    children: [
-      {
-        key: 'fgc-assembly-enclosure',
-        label: 'Enclosure',
-        children: [
-          {
-            key: 'fgc-assembly-enclosure-v1.0',
-            label: 'v1.0',
-            isGroup: true,
-            children: [
-              { key: 'fgc-enclosure-bottom', label: 'Bottom', src: 'foosball-goal-counter/models/assembly/enclosure/matrecos-bottom.stl', colorHex: '0xff8800', explodeOffset: {x: 0, y: 0, z: -10} },
-              { key: 'fgc-enclosure-top', label: 'Top', src: 'foosball-goal-counter/models/assembly/enclosure/matrecos-top.stl', colorHex: '0x00b7bd', explodeOffset: {x: 0, y: 0, z: 10} },
-            ]
-          }
-        ]
-      },
-      {
-        key: 'fgc-ramp-assembly-v0.5',
-        label: 'Ramp v0.5',
-        children: [
-          {
-            key: 'fgc-assembly-ramp-v0.5',
-            label: 'v0.5',
-            isGroup: true,
-            children: [
-              { key: 'fgc-ramp-assembly-v0.5-ramp-l', label: 'Left Ramp', src: 'foosball-goal-counter/models/assembly/ramp/v0.5/matrecos-ramp-l.stl', colorHex: '0x2f5ee6', explodeOffset: {x: -30, y: 0, z: 0} },
-              { key: 'fgc-ramp-assembly-v0.5-core-l', label: 'Left Core', src: 'foosball-goal-counter/models/assembly/ramp/v0.5/matrecos-core-l.stl', colorHex: '0x3366ff', explodeOffset: {x: -15, y: 0, z: 0} },
-              { key: 'fgc-ramp-assembly-v0.5-core-r', label: 'Right Core', src: 'foosball-goal-counter/models/assembly/ramp/v0.5/matrecos-core-r.stl', colorHex: '0x3366ff', explodeOffset: {x: 15, y: 0, z: 0} },
-              { key: 'fgc-ramp-assembly-v0.5-ramp-r', label: 'Right Ramp', src: 'foosball-goal-counter/models/assembly/ramp/v0.5/matrecos-ramp-r.stl', colorHex: '0x2f5ee6', explodeOffset: {x: 30, y: 0, z: 0} }
-            ]
-          }
-        ]
-      },
-      {
-        key: 'fgc-ramp-assembly-v2.2',
-        label: 'Ramp v2.2',
-        children: [
-          {
-            key: 'fgc-assembly-ramp-v2.2',
-            label: 'v2.2',
-            isGroup: true,
-            children: [
-              { key: 'fgc-ramp-assembly-v2.2-ramp-l', label: 'Left Ramp', src: 'foosball-goal-counter/models/assembly/ramp/v2.2/matrecos-ramp-l.stl', colorHex: '0x253fa6', explodeOffset: {x: 0, y: 0, z: 0} },
-              { key: 'fgc-ramp-assembly-v2.2-bridge', label: 'Bridge', src: 'foosball-goal-counter/models/assembly/ramp/v2.2/matrecos-bridge.stl', colorHex: '0x00aa55', explodeOffset: {x: 0, y: 0, z: 25} },
-              { key: 'fgc-ramp-assembly-v2.2-ramp-r', label: 'Right Ramp', src: 'foosball-goal-counter/models/assembly/ramp/v2.2/matrecos-ramp-r.stl', colorHex: '0x253fa6', explodeOffset: {x: 0, y: 0, z: 0} }
-            ]
-          }
         ]
       }
     ]

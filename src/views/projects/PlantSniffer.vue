@@ -3,8 +3,8 @@
   <n-p class="squid-semi-title">The Story</n-p>
     <n-p>
       This project was created in about a week to bring something personal to an Erasmus+ program focused on nature. 
-      I'll admit - I really pushed hard on the last few days to get it done. The circuit was semi-planned and assembled using perfboard 
-      with pre-made modules (microcontroller, battery charger, and humidity sensor), which meant the 3D-printed enclosure that holds and 
+      I'll admit - I really pushed hard on the last few days to get it done. The circuit was semi-planned and assembled on a perfboard 
+      using pre-made modules (microcontroller, battery charger, and humidity sensor), which meant the 3D-printed enclosure that holds and 
       protects everything went through several iterations to get it right.
     </n-p>
     <n-p>
@@ -15,7 +15,7 @@
     <n-p class="squid-semi-title">Key Features</n-p>
     <n-ul>
       <n-li>Calibration System: <span class="squid-text-alt">Adjust minimum and maximum relative humidity values based on your specific plant and soil conditions.</span></n-li>
-      <n-li>Visual Feedback: <span class="squid-text-alt">Three different animation modes to display humidity levels on a circular display.</span></n-li>
+      <n-li>Animated Visualization: <span class="squid-text-alt">Measures relative humidity and displays the results on a circular screen using three different, distinct animations.</span></n-li>
       <n-li>Portable Design: <span class="squid-text-alt">Battery-powered with integrated charging module for convenience.</span></n-li>
       <n-li>Custom Enclosure: <span class="squid-text-alt">3D-printed frame designed to house perfboard-based circuit and modules.</span></n-li>
     </n-ul>
@@ -28,11 +28,10 @@
     </n-ul>
     <n-p class="squid-semi-title">Challenges & Lessons Learned</n-p>
     <n-p>
-      Working under a one-week deadline was challenging, especially since the project required developing both firmware 
-      and hardware simultaneously. Using pre-made modules on perfboard was a practical time-saver, but it also meant 
-      the enclosure design needed to be flexible and went through multiple revisions. This project reinforced the 
-      importance of modular design and the value of rapid prototyping when time is limited. Sometimes you just have to 
-      commit and push through on that last day to make it happen.
+      Working with a strict one-week time limit was the biggest challenge, especially since it required developing both the firmware and the hardware/3D structure simultaneously from scratch. 
+      Using pre-made modules on a perfboard was a practical time-saver, but it also meant the enclosure design had to remain flexible, ultimately going through multiple revisions to fit everything together. 
+      There were also additional complications on the software side: I had to figure out how to save images to the file system and load them as if they were a GIF, with the animation frame rate and style controlled directly by the real-time humidity level. 
+      This project strongly reinforced the importance of modular design and the value of rapid prototyping when time is limited. Sometimes you just have to commit and push through on that last day to make it happen.
     </n-p>
     <n-p class="squid-semi-title">Links</n-p>
     <n-ul>
@@ -64,7 +63,32 @@ const media = ref<IMedia[]>([
   { type: 'image', src: 'plant-sniffer/images/no_pants.jpg', description: 'still missing it\'s pants' }
 ]);
 
-const models = ref<ICascadeCategory[]>([{
+const models = ref<ICascadeCategory[]>([
+  {
+  key: 'pl-assembly',
+  label: 'Assembly',
+  children: [
+    {
+      key: 'pl-assembly-v1.0',
+      label: 'V1.0',
+      children: [
+        {
+          key: 'pl-v1.0',
+          label: 'v1.0',
+          isGroup: true,
+          children: [
+            { key: 'pl-bottom-v1.0', label: 'Bottom', src: 'plant-sniffer/models/assembly/plant-sniffer-bottom-v1.0.stl', colorHex: '0xff7f00', explodeOffset: {x: 0, y: -15, z: -10} },
+            { key: 'pl-body-v1.0', label: 'Body', src: 'plant-sniffer/models/assembly/plant-sniffer-body-v1.0.stl', colorHex: '0xdcccec', explodeOffset: {x: 0, y: -15, z: 0} },
+            { key: 'pl-top-v1.0', label: 'Top', src: 'plant-sniffer/models/assembly/plant-sniffer-top-v1.0.stl', colorHex: '0xff7f00', explodeOffset: {x: 0, y: 0, z: 0} },
+            { key: 'pl-bth-v1.0', label: 'Battery Holder', src: 'plant-sniffer/models/assembly/plant-sniffer-bat-holder-v1.0.stl', colorHex: '0xdcccec', explodeOffset: {x: -10, y: 0, z: 0} },
+            { key: 'pl-handle-v1.0', label: 'Handle', src: 'plant-sniffer/models/assembly/plant-sniffer-handle-v1.0.stl', colorHex: '0xdcccec', explodeOffset: {x: 10, y: 0, z: 0} }
+          ]
+        }
+      ]
+    }
+  ]
+},
+{
   key: 'pl-parts',
   label: 'Parts',
   children: [
@@ -113,31 +137,8 @@ const models = ref<ICascadeCategory[]>([{
         { key: 'pl-top-v1.0', label: '1.0', src: 'plant-sniffer/models/plant-sniffer-top-v1.0.stl', colorHex: '0xff7f00' }
       ]
     }]
-},
-{
-  key: 'pl-assembly',
-  label: 'Assembly',
-  children: [
-    {
-      key: 'pl-assembly-v1.0',
-      label: 'V1.0',
-      children: [
-        {
-          key: 'pl-v1.0',
-          label: 'v1.0',
-          isGroup: true,
-          children: [
-            { key: 'pl-bottom-v1.0', label: 'Bottom', src: 'plant-sniffer/models/assembly/plant-sniffer-bottom-v1.0.stl', colorHex: '0xff7f00', explodeOffset: {x: 0, y: -15, z: -10} },
-            { key: 'pl-body-v1.0', label: 'Body', src: 'plant-sniffer/models/assembly/plant-sniffer-body-v1.0.stl', colorHex: '0xdcccec', explodeOffset: {x: 0, y: -15, z: 0} },
-            { key: 'pl-top-v1.0', label: 'Top', src: 'plant-sniffer/models/assembly/plant-sniffer-top-v1.0.stl', colorHex: '0xff7f00', explodeOffset: {x: 0, y: 0, z: 0} },
-            { key: 'pl-bth-v1.0', label: 'Battery Holder', src: 'plant-sniffer/models/assembly/plant-sniffer-bat-holder-v1.0.stl', colorHex: '0xdcccec', explodeOffset: {x: -10, y: 0, z: 0} },
-            { key: 'pl-handle-v1.0', label: 'Handle', src: 'plant-sniffer/models/assembly/plant-sniffer-handle-v1.0.stl', colorHex: '0xdcccec', explodeOffset: {x: 10, y: 0, z: 0} }
-          ]
-        }
-      ]
-    }
-  ]
-}]);
+}
+]);
 </script>
 
 <style scoped lang="sass">

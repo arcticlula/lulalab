@@ -24,12 +24,11 @@
     <n-p class="squid-semi-title">Challenges & Lessons Learned</n-p>
     <n-p>
       When testing most of the features, the biggest challenge really was that i could not be in two places at the same time. 
-      Since the main unit is at my apartment entrance, i had to go up and down multiple times to test each feature, which complicated debugging a bit.
+      Since the main unit is at my apartment entrance, i had to go up and down multiple times to capture the signals in my oscilloscope, which complicated debugging a bit.
     </n-p>
     <n-p class="squid-semi-title">Links</n-p>
     <n-ul>
       <n-li>Build notes and details are on the <n-a href="https://hackaday.io/project/203886-dumbledoor" target="_blank">[Hackaday]</n-a> page.</n-li>
-      
     </n-ul>
   </ProjectTemplate>
 </template>

@@ -2,7 +2,7 @@
   <ProjectTemplate id="mood-light" :media="media" :models="models">
     <n-p class="squid-semi-title">The Story</n-p>
     <n-p>
-      This project was born from a happy accident. I had some leftover WS2811 LED strips from my <router-link :to="{ name: 'ian' }"><n-a>thesis project</n-a></router-link> 
+      This project was born from a happy accident. I had some leftover WS2811 LED strips from my <router-link :to="{ name: 'toDo' }"><n-a>thesis project</n-a></router-link> 
       and a few plexiglass samples that I had originally ordered for the <router-link :to="{ name: 'netscore' }"><n-a>NetScore</n-a></router-link> project - I thought they'd be clear display protectors, 
       but they turned out to be translucent. This "mistake", however, turned out to be a pretty good material for a light diffuser.
       I designed a simple enclosure in Onshape, consisting of a 3D-printed frame that wraps around the plexiglass panel, with the LED strip running along the inner perimeter. 
@@ -37,8 +37,8 @@
     </n-p>
     <n-p class="squid-semi-title">Links</n-p>
     <n-ul>
-      <n-li><n-a href="toDo">[GitHub Repository]</n-a></n-li>
-      <n-li><n-a href="toDo">[Web App]</n-a></n-li>
+      <!-- <n-li><n-a href="toDo">[GitHub Repository]</n-a></n-li> -->
+      <!-- <n-li><n-a href="toDo">[Web App]</n-a></n-li> -->
       <n-li><n-a href="https://cad.onshape.com/documents/ffe826fd84c7b0b803a26dcf/w/2289f860d06ea32193ad4090/e/bda82098034db4c28fba08ea?renderMode=0&uiState=691cc052b1846ac8b07025d5">[Onshape]</n-a></n-li>
     </n-ul>
   </ProjectTemplate>
@@ -82,7 +82,33 @@ const media = ref<IMedia[]>([
   }
 ]);
 
-const models = ref<ICascadeCategory[]>([{
+const models = ref<ICascadeCategory[]>([
+  {
+  key: 'ml-assembly',
+  label: 'Assembly',
+  children: [
+    {
+      key: 'ml-assembly-v1.0',
+      label: 'V1.0',
+      children: [
+        {
+          key: 'ml-v1.0',
+          label: 'v1.0',
+          isGroup: true,
+          children: [
+            { key: 'ml-bottom-v1.0', label: 'Bottom', src: 'mood-light/models/assembly/lamp-bottom-v1.0.stl', colorHex: '0xff7f00' },
+            { key: 'ml-left-v1.0', label: 'Left', src: 'mood-light/models/assembly/lamp-left-v1.0.stl', colorHex: '0xff7f00' },
+            { key: 'ml-right-v1.0', label: 'Right', src: 'mood-light/models/assembly/lamp-right-v1.0.stl', colorHex: '0xff7f00' },
+            { key: 'ml-top-v1.0', label: 'Top', src: 'mood-light/models/assembly/lamp-top-v1.0.stl', colorHex: '0xff7f00' },
+            { key: 'ml-screen-v1.0', label: 'Screen', src: 'mood-light/models/assembly/lamp-screen-v1.0.stl', colorHex: '0xeeeeee', opacity: 0.9 },
+            { key: 'ml-tab-v1.0', label: 'Tab', src: 'mood-light/models/assembly/lamp-tab-v1.0.stl', colorHex: '0x00ff00' }
+          ]
+        }
+      ]
+    }
+  ]
+},
+{
   key: 'ml-parts',
   label: 'Parts',
   children: [
@@ -116,32 +142,8 @@ const models = ref<ICascadeCategory[]>([{
       ]
     }
   ]
-}, 
-{
-  key: 'ml-assembly',
-  label: 'Assembly',
-  children: [
-    {
-      key: 'ml-assembly-v1.0',
-      label: 'V1.0',
-      children: [
-        {
-          key: 'ml-v1.0',
-          label: 'v1.0',
-          isGroup: true,
-          children: [
-            { key: 'ml-bottom-v1.0', label: 'Bottom', src: 'mood-light/models/assembly/lamp-bottom-v1.0.stl', colorHex: '0xff7f00' },
-            { key: 'ml-left-v1.0', label: 'Left', src: 'mood-light/models/assembly/lamp-left-v1.0.stl', colorHex: '0xff7f00' },
-            { key: 'ml-right-v1.0', label: 'Right', src: 'mood-light/models/assembly/lamp-right-v1.0.stl', colorHex: '0xff7f00' },
-            { key: 'ml-top-v1.0', label: 'Top', src: 'mood-light/models/assembly/lamp-top-v1.0.stl', colorHex: '0xff7f00' },
-            { key: 'ml-screen-v1.0', label: 'Screen', src: 'mood-light/models/assembly/lamp-screen-v1.0.stl', colorHex: '0xeeeeee', opacity: 0.9 },
-            { key: 'ml-tab-v1.0', label: 'Tab', src: 'mood-light/models/assembly/lamp-tab-v1.0.stl', colorHex: '0x00ff00' }
-          ]
-        }
-      ]
-    }
-  ]
-}]);
+}
+]);
 </script>
 
 <style scoped lang="sass">

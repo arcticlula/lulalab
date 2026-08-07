@@ -44,6 +44,44 @@ const media = ref<IMedia[]>([
 
 const models = ref<ICascadeCategory[]>([
   {
+    key: 'cr-assembly',
+    label: 'Assembly',
+    children: [
+      {
+        key: 'cr-assembly-v1.0',
+        label: 'v1.0',
+        isGroup: true,
+        children: [
+          {
+            key: 'cr-assembly-v1.0-group',
+            label: 'v1.0',
+            isGroup: true,
+            children: [
+              { key: 'cr-assembly-v1.0-bottom', label: 'Bottom', src: 'comando-rita/models/comando-bottom-v1.0.stl', colorHex: '0xff9900', explodeOffset: {x: 0, y: 0, z: -10} },
+              { key: 'cr-assembly-v1.0-top', label: 'Top', src: 'comando-rita/models/comando-top-v1.0.stl', colorHex: '0x00ccd2', explodeOffset: {x: 0, y: 0, z: 10} },
+            ]
+          }
+        ]
+      },
+      {
+        key: 'cr-assembly-v0.01',
+        label: 'v0.01',
+        isGroup: true,
+        children: [
+          {
+            key: 'cr-assembly-v0.01-group',
+            label: 'v0.01',
+            isGroup: true,
+            children: [
+              { key: 'cr-assembly-v0.01-bottom', label: 'Bottom', src: 'comando-rita/models/comando-bottom-v0.01.stl', colorHex: '0xff8800', explodeOffset: {x: 0, y: 0, z: -10} },
+              { key: 'cr-assembly-v0.01-top', label: 'Top', src: 'comando-rita/models/comando-top-v0.01.stl', colorHex: '0x00b7bd', explodeOffset: {x: 0, y: 0, z: 10} },
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     key: 'cr-enclosure',
     label: 'Enclosure',
     children: [
@@ -63,44 +101,6 @@ const models = ref<ICascadeCategory[]>([
           { key: 'cr-top-v1.0', label: 'v1.0', src: 'comando-rita/models/comando-top-v1.0.stl', colorHex: '0x00ccd2' },
         ]
       },
-    ]
-  },
-  {
-    key: 'cr-assembly',
-    label: 'Assembly',
-    children: [
-      {
-        key: 'cr-assembly-v0.01',
-        label: 'v0.01',
-        isGroup: true,
-        children: [
-          {
-            key: 'cr-assembly-v0.01-group',
-            label: 'v0.01',
-            isGroup: true,
-            children: [
-              { key: 'cr-assembly-v0.01-bottom', label: 'Bottom', src: 'comando-rita/models/comando-bottom-v0.01.stl', colorHex: '0xff8800', explodeOffset: {x: 0, y: 0, z: -10} },
-              { key: 'cr-assembly-v0.01-top', label: 'Top', src: 'comando-rita/models/comando-top-v0.01.stl', colorHex: '0x00b7bd', explodeOffset: {x: 0, y: 0, z: 10} },
-            ]
-          }
-        ]
-      },
-      {
-        key: 'cr-assembly-v1.0',
-        label: 'v1.0',
-        isGroup: true,
-        children: [
-          {
-            key: 'cr-assembly-v1.0-group',
-            label: 'v1.0',
-            isGroup: true,
-            children: [
-              { key: 'cr-assembly-v1.0-bottom', label: 'Bottom', src: 'comando-rita/models/comando-bottom-v1.0.stl', colorHex: '0xff9900', explodeOffset: {x: 0, y: 0, z: -10} },
-              { key: 'cr-assembly-v1.0-top', label: 'Top', src: 'comando-rita/models/comando-top-v1.0.stl', colorHex: '0x00ccd2', explodeOffset: {x: 0, y: 0, z: 10} },
-            ]
-          }
-        ]
-      }
     ]
   }
 ]);

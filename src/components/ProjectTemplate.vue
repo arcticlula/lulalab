@@ -24,9 +24,10 @@
     
     <!-- 3D Model Viewer -->
     <template v-if="models && models.length > 0">
-      <n-p>3D Model Viewer</n-p>
-      <div>
+      <n-p class="squid-semi-title">3D Model Viewer</n-p>
+      <div ref="viewerContainer" class="viewer-container-wrapper">
         <ModelViewer
+          v-if="shouldLoad3D"
           ref="viewer"
           :models="models"
           />
@@ -37,13 +38,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue';
 
 import { IMedia, ICascadeCategory } from '../models/media';
 import { formatMonthYear } from '../utils/date';
 import MediaCarousel from './MediaCarousel.vue';
-import ModelViewer from './ModelViewer.vue';
 import { getProjectByRouteName, Project } from '../data/projects';
+
+const ModelViewer = defineAsyncComponent(() => import('./ModelViewer.vue'));
 
 interface Props {
   id: string;
@@ -76,6 +78,36 @@ const statusType = computed(() => {
       return 'info';
   }
 });
+
+// Lazy Loading Logic
+const viewerContainer = ref<HTMLDivElement | null>(null);
+const shouldLoad3D = ref(false);
+let observer: IntersectionObserver | null = null;
+
+onMounted(() => {
+  if (props.models && props.models.length > 0) {
+    observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        shouldLoad3D.value = true;
+        if (observer && viewerContainer.value) {
+          observer.unobserve(viewerContainer.value);
+          observer.disconnect();
+          observer = null;
+        }
+      }
+    }, { rootMargin: '200px' }); // Start loading 200px before it comes into view
+
+    if (viewerContainer.value) {
+      observer.observe(viewerContainer.value);
+    }
+  }
+});
+
+onBeforeUnmount(() => {
+  if (observer) {
+    observer.disconnect();
+  }
+});
 </script>
 
 <style scoped lang="sass">
@@ -100,9 +132,12 @@ const statusType = computed(() => {
   justify-content: center
   margin-top: 24px
 
+.viewer-container-wrapper
+  min-height: 500px
+
 @media (max-width: 800px)
   .project-view
-    padding: 0 4px !important
+    padding: 0 !important
   .subtitle
     justify-content: space-between
 </style>

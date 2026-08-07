@@ -40,11 +40,11 @@
     <n-p>
       The main challenge in this project was working with an unofficial API, which meant dealing with potential changes that could break functionality. 
       Additionally, implementing a reverse proxy was a little tricky for which i opted to use a public service to avoid hosting my own.
-      I was a bit lucky in the sense i had some screenshots of the app while Aircourts was still active, or it would not be possible to show certain features.
+      I was a bit lucky i had some screenshots of the app while Aircourts was still active, or it would not be possible to show certain features now.
     </n-p>
     <n-p class="squid-semi-title">Links</n-p>
     <n-ul>
-      <n-li><n-a href="https://better-courts.web.app/" target="_blank">[BetterCourts]</n-a></n-li>
+      <n-li><n-a href="https://better-courts.web.app/" target="_blank">[BetterCourts - search not working as expected]</n-a></n-li>
       <n-li><n-a href="https://github.com/arcticlula/Better-Courts" target="_blank">[GitHub Repository]</n-a></n-li>
     </n-ul>
   </ProjectTemplate>
@@ -56,7 +56,7 @@ import ProjectTemplate from '../../components/ProjectTemplate.vue';
 import { IMedia } from '../../models/media';
 
 const media = ref<IMedia[]>([
-  { type: 'video', src: 'better-courts/videos/screen-20251126-195515.mp4', description: 'main screen recording - search UI' },
+  { type: 'video', src: 'better-courts/videos/screen-20251126-195515.mp4', description: 'mobile screen recording - search UI' },
   { type: 'image', src: 'better-courts/images/Screenshot_2025-11-26-201436.jpg', description: 'desktop UI' },
   { type: 'image', src: 'better-courts/images/Screenshot_20220721-134800.jpg', description: 'results view for padel' },
   { type: 'image', src: 'better-courts/images/Screenshot_20220808-142725.jpg', description: 'results view for football - notice how the same court repeats but in different time slots' },
