@@ -43,9 +43,11 @@
 import { ArrowMove20Regular, ArrowMoveInward20Regular } from '@vicons/fluent';
 import * as THREE from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 import { VRMLLoader } from "three/examples/jsm/loaders/VRMLLoader.js";
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 import { IModel, ICascadeCategory } from '../models/media';
 
@@ -65,9 +67,27 @@ let renderer: THREE.WebGLRenderer;
 let controls: OrbitControls;
 let currentGroup: THREE.Group | null = null;
 let pivotHelpers: THREE.Group = new THREE.Group();
+// bumped per load so a slow load can tell it has been superseded
+let loadToken = 0;
+
+// The loop only runs while something is actually moving (orbit damping, an
+// explode tween, a model swap). Idle viewers cost nothing.
+let rafId: number | null = null;
+let renderRequested = false;
+let isVisible = true;
+let visibilityObserver: IntersectionObserver | null = null;
 
 const stlLoader = new STLLoader();
 const vrmlLoader = new VRMLLoader();
+
+// The boards ship as Draco compressed glb - decoding happens off the main
+// thread in a worker, so a big PCB no longer freezes the page while it parses.
+const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath(`${import.meta.env.BASE_URL}draco/`);
+dracoLoader.setDecoderConfig({ type: 'wasm' });
+
+const gltfLoader = new GLTFLoader();
+gltfLoader.setDRACOLoader(dracoLoader);
 
 const selectedPath = ref<string[] | null>(null);
 const previousSelectedPath = ref<string[] | null>(null);
@@ -86,6 +106,35 @@ let baseDirections = new Map<string, THREE.Vector3>();
 let customExplodeOffsets = new Map<string, { x: number; y: number; z: number }>();
 let customExplodeRotations = new Map<string, { x: number; y: number; z: number }>();
 let modelSize = 1;
+
+type Tween = {
+  mesh: THREE.Object3D;
+  startPos: THREE.Vector3;
+  targetPos: THREE.Vector3;
+  startQuat: THREE.Quaternion;
+  endQuat: THREE.Quaternion;
+  startTime: number;
+};
+const EXPLODE_DURATION = 350;
+const activeTweens: Tween[] = [];
+
+// One noise texture shared by every material: building it per mesh meant 256k
+// random calls and a texture upload for each part of an assembly.
+let noiseTexture: THREE.DataTexture | null = null;
+
+function getNoiseTexture() {
+  if (noiseTexture) return noiseTexture;
+
+  const size = 128;
+  const data = new Uint8Array(size * size * 4);
+  for (let i = 0; i < data.length; i++) data[i] = 128 + Math.random() * 40;
+
+  noiseTexture = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
+  noiseTexture.wrapS = noiseTexture.wrapT = THREE.RepeatWrapping;
+  noiseTexture.repeat.set(10, 10);
+  noiseTexture.needsUpdate = true;
+  return noiseTexture;
+}
 
 // Cache for model lookups to avoid repeated searching
 let modelLookupCache = new Map<string, any>();
@@ -355,6 +404,8 @@ watch(visibleParts, () => {
   if (isExploded.value) {
     reapplyExplosion();
   }
+
+  requestRender();
 }, { deep: true });
 
 
@@ -373,8 +424,44 @@ watch(selectedVersionIsGroup, (isGroup) => {
 
 onMounted(() => {
   initThree();
+
+  // Stop rendering entirely while the viewer is scrolled out of view
+  visibilityObserver = new IntersectionObserver(([entry]) => {
+    isVisible = entry.isIntersecting;
+    if (isVisible) scheduleFrame();
+    else cancelFrame();
+  }, { rootMargin: '100px' });
+  visibilityObserver.observe(viewerContainer.value!);
+
   loadModel();
-  animate();
+  requestRender();
+});
+
+onBeforeUnmount(() => {
+  cancelFrame();
+  isVisible = false;
+  activeTweens.length = 0;
+
+  visibilityObserver?.disconnect();
+  visibilityObserver = null;
+
+  controls?.dispose();
+
+  if (currentGroup) {
+    scene.remove(currentGroup);
+    disposeObject(currentGroup);
+    currentGroup = null;
+  }
+  clearPivotHelpers();
+  scene?.clear();
+
+  if (renderer) {
+    renderer.dispose();
+    // hands the WebGL context back now instead of waiting for GC - browsers
+    // only allow a handful at a time, and route changes churn through them
+    renderer.forceContextLoss();
+    renderer.domElement.remove();
+  }
 });
 
 function initThree() {
@@ -389,13 +476,15 @@ function initThree() {
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(w, h);
-  renderer.setPixelRatio(window.devicePixelRatio);
+  // uncapped DPR renders 4x the fragments on a retina panel for no visible gain
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   viewerContainer.value!.appendChild(renderer.domElement);
 
   controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.05;
+  controls.addEventListener('change', requestRender);
 
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
   scene.add(ambientLight);
@@ -420,32 +509,54 @@ async function loadModel() {
   }
   if (!filePaths.value.length) return;
 
-  const cascaderChanged = JSON.stringify(previousSelectedPath.value) !== JSON.stringify(selectedPath.value);
-  previousSelectedPath.value = selectedPath.value ? [...selectedPath.value] : null;
+  // Several watchers fire loadModel at once (and again on every toggle). Each
+  // run builds into its own group and only swaps in if it is still the newest,
+  // otherwise concurrent runs interleave meshes and the model renders twice.
+  const token = ++loadToken;
 
+  const cascaderChanged = JSON.stringify(previousSelectedPath.value) !== JSON.stringify(selectedPath.value);
   const isNewModule = selectedVersionSrc.value !== currentModuleName;
 
-  if (currentGroup && scene) scene.remove(currentGroup);
-  currentGroup = new THREE.Group();
-
+  const group = new THREE.Group();
   const meshes: THREE.Mesh[] = [];
+
   for (const path of filePaths.value) {
-    const isVRML = path.toLowerCase().endsWith('.wrl') || path.toLowerCase().endsWith('.vrml');
-    
-    if (isVRML) {
+    const lower = path.toLowerCase();
+    const isVRML = lower.endsWith('.wrl') || lower.endsWith('.vrml');
+    const isGLTF = lower.endsWith('.glb') || lower.endsWith('.gltf');
+
+    if (isGLTF) {
+      const gltfScene = await loadGLTF(path);
+      gltfScene.userData.src = path;
+      meshes.push(gltfScene as any);
+      group.add(gltfScene);
+    } else if (isVRML) {
       const vrmlScene = await loadVRML(path);
       vrmlScene.userData.src = path;
       meshes.push(vrmlScene as any);
-      currentGroup.add(vrmlScene);
+      group.add(vrmlScene);
     } else {
       const geom = await loadSTL(path);
       const mesh = createMeshWithMaterial(geom, path);
       mesh.userData.src = path;
       meshes.push(mesh);
-      currentGroup.add(mesh);
+      group.add(mesh);
     }
   }
 
+  // a newer load started while this one was fetching - drop this result
+  if (token !== loadToken || !scene) {
+    disposeObject(group);
+    return;
+  }
+
+  previousSelectedPath.value = selectedPath.value ? [...selectedPath.value] : null;
+
+  if (currentGroup) {
+    scene.remove(currentGroup);
+    disposeObject(currentGroup);
+  }
+  currentGroup = group;
   scene.add(currentGroup);
 
   if (isNewModule) {
@@ -492,10 +603,20 @@ async function loadModel() {
   }
 
   updatePivotHelpers();
+  requestRender();
+}
+
+function clearPivotHelpers() {
+  pivotHelpers.children.forEach(child => {
+    const dot = child as THREE.Mesh;
+    dot.geometry?.dispose();
+    (dot.material as THREE.Material)?.dispose();
+  });
+  pivotHelpers.clear();
 }
 
 function updatePivotHelpers() {
-  pivotHelpers.clear();
+  clearPivotHelpers();
   if (!currentGroup) return;
 
   currentGroup.children.forEach(mesh => {
@@ -524,6 +645,12 @@ function loadSTL(path: string): Promise<THREE.BufferGeometry> {
 function loadVRML(path: string): Promise<THREE.Scene> {
   return new Promise((resolve, reject) => {
     vrmlLoader.load(path, resolve, undefined, reject);
+  });
+}
+
+function loadGLTF(path: string): Promise<THREE.Group> {
+  return new Promise((resolve, reject) => {
+    gltfLoader.load(path, (gltf) => resolve(gltf.scene), undefined, reject);
   });
 }
 
@@ -559,14 +686,6 @@ function createMeshWithMaterial(geometry: THREE.BufferGeometry, path: string) {
   const colorHex = part?.colorHex ?? "0xffffff";
   const opacity = part?.opacity ?? 1;
 
-  const size = 128;
-  const data = new Uint8Array(size * size * 4);
-  for (let i = 0; i < data.length; i++) data[i] = 128 + Math.random() * 40;
-  const noise = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
-  noise.wrapS = noise.wrapT = THREE.RepeatWrapping;
-  noise.repeat.set(10, 10);
-  noise.needsUpdate = true;
-
   const material = new THREE.MeshStandardMaterial({
     color: parseInt(colorHex.replace("#", ""), 16),
     transparent: opacity < 1,
@@ -574,7 +693,7 @@ function createMeshWithMaterial(geometry: THREE.BufferGeometry, path: string) {
     roughness: 0.6,
     metalness: 0.05,
     emissive: 0x111111,
-    normalMap: noise,
+    normalMap: getNoiseTexture(),
     normalScale: new THREE.Vector2(0.2, 0.2),
     side: THREE.DoubleSide,
   });
@@ -615,10 +734,62 @@ function fitCameraToModel(obj?: THREE.Object3D) {
   camera.lookAt(center);
 }
 
-function animate() {
-  requestAnimationFrame(animate);
-  controls.update();
+function scheduleFrame() {
+  if (rafId === null && isVisible && renderer) rafId = requestAnimationFrame(renderFrame);
+}
+
+function cancelFrame() {
+  if (rafId !== null) cancelAnimationFrame(rafId);
+  rafId = null;
+}
+
+function requestRender() {
+  renderRequested = true;
+  scheduleFrame();
+}
+
+function renderFrame() {
+  rafId = null;
+  if (!isVisible || !renderer) return;
+
+  renderRequested = false;
+  stepTweens(performance.now());
+  // update() reports whether damping is still settling the camera
+  const cameraMoving = controls.update();
   renderer.render(scene, camera);
+
+  if (cameraMoving || renderRequested || activeTweens.length > 0) scheduleFrame();
+}
+
+function stepTweens(now: number) {
+  for (let i = activeTweens.length - 1; i >= 0; i--) {
+    const tween = activeTweens[i];
+    const t = Math.min((now - tween.startTime) / EXPLODE_DURATION, 1);
+    const easedT = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+    tween.mesh.position.lerpVectors(tween.startPos, tween.targetPos, easedT);
+    tween.mesh.quaternion.slerpQuaternions(tween.startQuat, tween.endQuat, easedT);
+
+    if (t >= 1) activeTweens.splice(i, 1);
+  }
+}
+
+function disposeObject(obj: THREE.Object3D) {
+  obj.traverse((child) => {
+    const mesh = child as THREE.Mesh;
+    if (mesh.geometry) mesh.geometry.dispose();
+
+    const material = mesh.material;
+    if (Array.isArray(material)) material.forEach(disposeMaterial);
+    else if (material) disposeMaterial(material);
+  });
+}
+
+function disposeMaterial(material: THREE.Material) {
+  // the noise map is shared across every mesh, so it outlives any single one
+  const normalMap = (material as THREE.MeshStandardMaterial).normalMap;
+  if (normalMap && normalMap !== noiseTexture) normalMap.dispose();
+  material.dispose();
 }
 
 function toggleExplode() {
@@ -758,28 +929,21 @@ function resetModel() {
   });
 }
 
+// queued onto the shared render loop rather than each mesh driving its own rAF
 function animateMesh(mesh: THREE.Object3D, targetPos: THREE.Vector3, targetRot: THREE.Euler) {
-  const startPos = mesh.position.clone();
-  const startQuat = mesh.quaternion.clone();
-  const endQuat = new THREE.Quaternion().setFromEuler(targetRot);
-  
-  const duration = 0.35;
-  const startTime = performance.now();
+  const inFlight = activeTweens.findIndex(t => t.mesh === mesh);
+  if (inFlight > -1) activeTweens.splice(inFlight, 1);
 
-  function update() {
-    const elapsed = (performance.now() - startTime) / 1000;
-    const t = Math.min(elapsed / duration, 1);
+  activeTweens.push({
+    mesh,
+    startPos: mesh.position.clone(),
+    targetPos: targetPos.clone(),
+    startQuat: mesh.quaternion.clone(),
+    endQuat: new THREE.Quaternion().setFromEuler(targetRot),
+    startTime: performance.now()
+  });
 
-    // Ease in-out
-    const easedT = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-
-    mesh.position.lerpVectors(startPos, targetPos, easedT);
-    mesh.quaternion.slerpQuaternions(startQuat, endQuat, easedT);
-
-    if (t < 1) requestAnimationFrame(update);
-  }
-
-  requestAnimationFrame(update);
+  scheduleFrame();
 }
 </script>
 

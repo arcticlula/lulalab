@@ -98,28 +98,28 @@ const media = ref<IMedia[]>([
           key: 'ns-display-board',
           label: 'Display Board',
           children: [
-            { key: 'ns-display-board-v1.0', label: '1.0', src: 'netscore-v2/models/pcb/display-board-v1.0.wrl', bareSrc: 'netscore-v2/models/pcb/display-board-v1.0-bare.wrl'}
+            { key: 'ns-display-board-v1.0', label: '1.0', src: 'netscore-v2/models/pcb/display-board-v1.0.glb', bareSrc: 'netscore-v2/models/pcb/display-board-v1.0-bare.glb'}
           ]
         },
         {
           key: 'ns-big-display-board',
           label: 'Display Board Big',
           children: [
-            { key: 'ns-big-display-board-v1.0', label: '1.0', src: 'netscore-v2/models/pcb/display-board-big-v1.0.wrl', bareSrc: 'netscore-v2/models/pcb/display-board-big-v1.0-bare.wrl'}
+            { key: 'ns-big-display-board-v1.0', label: '1.0', src: 'netscore-v2/models/pcb/display-board-big-v1.0.glb', bareSrc: 'netscore-v2/models/pcb/display-board-big-v1.0-bare.glb'}
           ]
         },
         {
           key: 'ns-main-board',
           label: 'Main Board',
           children: [
-            { key: 'ns-main-board-v1.0', label: '1.0', src: 'netscore-v2/models/pcb/main-board-v1.0.wrl', bareSrc: 'netscore-v2/models/pcb/main-board-v1.0-bare.wrl'}
+            { key: 'ns-main-board-v1.0', label: '1.0', src: 'netscore-v2/models/pcb/main-board-v1.0.glb', bareSrc: 'netscore-v2/models/pcb/main-board-v1.0-bare.glb'}
           ]
         },
         {
           key: 'ns-adapter-board',
           label: 'Display Big Adapter Board',
           children: [
-            { key: 'ns-adapter-board-v1.0', label: '1.0', src: 'netscore-v2/models/pcb/display-board-big-adaptor.wrl', bareSrc: 'netscore-v2/models/pcb/display-board-big-adaptor-bare.wrl'}
+            { key: 'ns-adapter-board-v1.0', label: '1.0', src: 'netscore-v2/models/pcb/display-board-big-adaptor.glb'}
           ]
         }
       ]

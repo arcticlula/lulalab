@@ -113,17 +113,17 @@ const models = ref<ICascadeCategory[]>([
         key: 'ns3-main-board',
         label: 'Main Board',
         children: [
-          { key: 'ns3-main-board-v3.0', label: '3.0', src: 'netscore-v3/models/pcb/main-board-v3.0.wrl', bareSrc: 'netscore-v3/models/pcb/main-board-v3.0-bare.wrl'}
+          { key: 'ns3-main-board-v3.0', label: '3.0', src: 'netscore-v3/models/pcb/main-board-v3.0.glb', bareSrc: 'netscore-v3/models/pcb/main-board-v3.0-bare.glb'}
         ]
       },
       {
         key: 'ns3-big-display-board',
         label: 'Display Board Big',
         children: [
-          { key: 'ns3-big-display-board-v3.0', label: '3.0', src: 'netscore-v3/models/pcb/display-board-big-v3.0.wrl', bareSrc: 'netscore-v3/models/pcb/display-board-big-v3.0-bare.wrl'}
+          { key: 'ns3-big-display-board-v3.0', label: '3.0', src: 'netscore-v3/models/pcb/display-board-big-v3.0.glb', bareSrc: 'netscore-v3/models/pcb/display-board-big-v3.0-bare.glb'}
         ]
       },
-      { key: 'ns3-display-board-adapter', label: 'Display Board Adapter', src: 'netscore-v3/models/pcb/old-display-board-adapter.wrl', bareSrc: 'netscore-v3/models/pcb/old-display-board-adapter-bare.wrl'}
+      { key: 'ns3-display-board-adapter', label: 'Display Board Adapter', src: 'netscore-v3/models/pcb/old-display-board-adapter.glb', bareSrc: 'netscore-v3/models/pcb/old-display-board-adapter-bare.glb'}
     ]
   }
 ]);

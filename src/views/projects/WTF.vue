@@ -51,7 +51,7 @@ const models = ref<ICascadeCategory[]>([
   {
     key: 'wtf-pcb-v1.0',
     label: 'PCB v1.0',
-    src: 'wtf/models/pcb/wtf.wrl'
+    src: 'wtf/models/pcb/wtf.glb'
   }
 ]);
 

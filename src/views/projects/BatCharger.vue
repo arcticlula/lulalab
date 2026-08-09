@@ -57,7 +57,7 @@ const models = ref<ICascadeCategory[]>([
   {
     key: 'bc-pcb-v1.0',
     label: 'PCB v1.0',
-    src: 'bat-charger/models/pcb/bat-charger-v1.0.wrl'
+    src: 'bat-charger/models/pcb/bat-charger-v1.0.glb'
   }
 ]);
 </script>

@@ -99,15 +99,15 @@ const media = ref<IMedia[]>([
           key: 'ns-display-board',
           label: 'Display Board',
           children: [
-            { key: 'ns-display-board-v1.0', label: '1.0', src: 'netscore/models/pcb/display-board-v1.0.wrl'},
-            { key: 'ns-display-board-v1.2', label: '1.2', src: 'netscore/models/pcb/display-board-v1.2.wrl', bareSrc: 'netscore/models/pcb/display-board-v1.2-bare.wrl'}
+            { key: 'ns-display-board-v1.0', label: '1.0', src: 'netscore/models/pcb/display-board-v1.0.glb'},
+            { key: 'ns-display-board-v1.2', label: '1.2', src: 'netscore/models/pcb/display-board-v1.2.glb', bareSrc: 'netscore/models/pcb/display-board-v1.2-bare.glb'}
           ]
         },
         {
           key: 'ns-main-board',
           label: 'Main Board',
           children: [
-            { key: 'ns-main-board-v1.0', label: '1.0', src: 'netscore/models/pcb/main-board-v1.0.wrl', bareSrc: 'netscore/models/pcb/main-board-v1.0-bare.wrl'}
+            { key: 'ns-main-board-v1.0', label: '1.0', src: 'netscore/models/pcb/main-board-v1.0.glb', bareSrc: 'netscore/models/pcb/main-board-v1.0-bare.glb'}
           ]
         }
       ]

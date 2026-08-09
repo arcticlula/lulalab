@@ -2,7 +2,7 @@
   <div class="carousel-div">
     <n-image-group>
       <n-carousel class="carousel" :show-arrow="!isMobile" :show-dots="isMobile" dot-type="line" @update:current-index="(i: number) => selectedIndex = i">
-        <template v-for="item in media">
+        <template v-for="(item, index) in media" :key="item.src">
             <!-- Image media -->
             <n-image
               v-if="item.type === 'image'"
@@ -10,6 +10,7 @@
               :src="failedImageAvif.has(item.src) ? item.src : getImageSrc(item)"
               :alt="item?.description || 'no description here blind person, sorry'"
               object-fit="contain"
+              :lazy="isDeferred(index)"
               @error="onImageFail(item)"
             />
             <template v-else-if="item.type === 'video'">
@@ -18,6 +19,7 @@
                 class="carousel-avif"
                 :src="getVideoAvif(item)"
                 :alt="item?.description || 'video (avif) placeholder'"
+                :loading="isDeferred(index) ? 'lazy' : 'eager'"
                 @error="onVideoAvifFail(item)"
               />
               <video
@@ -57,7 +59,18 @@ import { useAvif } from '../composables/useAvif';
 const selectedIndex = ref(0);
 const { isMobile } = useMobileDetection();
 
-defineProps<{ media: IMedia[] }>();
+const props = defineProps<{ media: IMedia[] }>();
+
+// The carousel keeps every slide in the DOM, so without this a 14 image project
+// fires 14 full size requests on mount. Only the current slide and its two
+// neighbours load eagerly; flipping lazy back off resumes a deferred fetch, so
+// the next slide is already in flight by the time you reach it.
+function isDeferred(index: number) {
+  const total = props.media.length;
+  const raw = Math.abs(index - selectedIndex.value);
+  const distance = Math.min(raw, total - raw); // the carousel wraps around
+  return distance > 1;
+}
 
 const { deriveAvifPath, getPreferredImage } = useAvif();
 const failedVideoAvif = ref<Set<string>>(new Set());

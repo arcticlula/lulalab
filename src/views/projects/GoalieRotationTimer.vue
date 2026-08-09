@@ -67,8 +67,8 @@ const media = ref<IMedia[]>([
 ]);
 
 const models = ref<ICascadeCategory[]>([
-  { key: 'grt-pcb-v1', label: 'PCB v1.0', src: 'goalie-rotation-timer/models/pcb/Goalie-Rotation-Timer-v1.0.wrl' },
-  { key: 'grt-pcb-v2', label: 'PCB v2.0', src: 'goalie-rotation-timer/models/pcb/Goalie-Rotation-Timer-v2.0.wrl' },
+  { key: 'grt-pcb-v1', label: 'PCB v1.0', src: 'goalie-rotation-timer/models/pcb/Goalie-Rotation-Timer-v1.0.glb' },
+  { key: 'grt-pcb-v2', label: 'PCB v2.0', src: 'goalie-rotation-timer/models/pcb/Goalie-Rotation-Timer-v2.0.glb' },
 ]);
 </script>
 
