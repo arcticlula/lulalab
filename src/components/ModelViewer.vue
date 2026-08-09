@@ -976,6 +976,7 @@ function animateMesh(mesh: THREE.Object3D, targetPos: THREE.Vector3, targetRot: 
 
   .bare-list
     white-space: nowrap
+    margin-bottom: 4px
 
   .checkbox-grid
     display: grid
