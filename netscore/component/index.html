@@ -368,14 +368,7 @@
             }
         }
 
-        // Unlock audio on first user interaction
-        document.body.addEventListener('click', initAudio, { once: true });
-        document.body.addEventListener('touchstart', initAudio, { once: true });
-        document.body.addEventListener('keydown', initAudio, { once: true });
-
-        // Exposed function for C++ to call
         window.playTone = function (frequency, durationMs, delayMs) {
-            initAudio();
             if (!audioCtx) return;
 
             const startTime = audioCtx.currentTime + (delayMs / 1000);
@@ -387,7 +380,6 @@
             osc.type = 'square'; // chiptune style
             osc.frequency.value = frequency;
 
-            // Envelope to avoid clicking
             gain.gain.setValueAtTime(0, startTime);
             gain.gain.linearRampToValueAtTime(0.1, startTime + 0.01); // Attack
             gain.gain.setValueAtTime(0.1, startTime + duration - 0.01);
@@ -417,16 +409,22 @@
             startLoop();
         };
 
-        let animationFrameId;
+        let muxIntervalId, logicIntervalId, animationFrameId;
 
         function startLoop() {
-            if (intervalId) clearInterval(intervalId);
+            if (muxIntervalId) clearInterval(muxIntervalId);
+            if (logicIntervalId) clearInterval(logicIntervalId);
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
 
-            // Simulation Loop (2.05ms)
-            intervalId = setInterval(() => {
-                Module._advance_mux_and_update();
+            // Mux Loop (2.05ms) - Matches hardware timer
+            muxIntervalId = setInterval(() => {
+                Module._advance_mux_only();
             }, 2.05);
+
+            // Logic Loop (30ms) - Matches display_logic_task
+            logicIntervalId = setInterval(() => {
+                Module._run_display();
+            }, 30);
 
             // Render Loop (60Hz / Monitor Refresh Rate)
             render();
@@ -544,7 +542,6 @@
                     Module._set_muted(isMuted ? 1 : 0);
                 }
 
-                // Update Icon
                 if (isMuted) {
                     muteIconUse.setAttribute('href', '#icon-speaker-off');
                 } else {
