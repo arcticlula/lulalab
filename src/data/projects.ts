@@ -9,6 +9,8 @@ export interface Project {
   src: string;
   srcType: 'image' | 'video';
   routeName: string;
+  /** keeps the entry out of the listings and the home page - the page itself still works if you know the url */
+  hidden?: boolean;
 }
 
 export const projectData: Project[] = [
@@ -51,6 +53,17 @@ export const projectData: Project[] = [
     src: 'netscore-v3/images/pcbs/main-board-front.png',
     srcType: 'image',
     routeName: 'netscore-v3'
+  },
+  {
+    name: 'Lulalab',
+    date: '2025-11-09',
+    keywords: ['Software', 'Web App', 'Vue', 'Three.js', 'WebGL', 'Performance', 'Responsive Design'],
+    description: 'This website - a static Vue app that ships its own WebGL board viewer, hands out AVIF whenever the browser takes it, and rebuilds its layout instead of shrinking it on small screens.',
+    status: 'Ongoing',
+    src: 'lulalab/images/projects-grid.jpg',
+    srcType: 'image',
+    routeName: 'lulalab',
+    hidden: true
   },
   {
     name: 'Plant Sniffer',

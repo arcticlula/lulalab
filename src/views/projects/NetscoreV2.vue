@@ -16,7 +16,7 @@
     
     <n-p class="squid-semi-title">Scoreboard Simulation</n-p>
     <n-p>Press the buttons in the remotes to navigate and hold to enter the menus.</n-p>
-    <iframe src="netscore-v2/component/index.html" class="netscore-iframe" scrolling="no" loading="lazy"></iframe>
+    <LazyIframe src="netscore-v2/component/index.html" class="netscore-iframe" scrolling="no" />
     
     <n-p class="squid-semi-title">Key Features</n-p>
     <n-ul>
@@ -61,10 +61,13 @@
     </n-p>
     <n-p class="squid-semi-title">Links</n-p>
     <n-ul>
-      <n-li><router-link :to="{ name: 'netscore' }"><n-a>[Netscore V1.0]</n-a></router-link></n-li>
-      <n-li><router-link :to="{ name: 'netscore-v3' }"><n-a>[Netscore V3.0]</n-a></router-link></n-li>
       <n-li><n-a href="https://github.com/arcticlula/Netscore">[GitHub Repository]</n-a></n-li>
       <n-li><n-a href="https://cad.onshape.com/documents/b77c65aa9f98b1a181901fda/w/c8c1eab4d3aef0fc975e9b81/e/b66468ba799907ee8e385394?renderMode=0&uiState=6a00b787cd669e2f9e178496">[Onshape]</n-a></n-li>
+      <n-li><router-link :to="{ name: 'netscore' }"><n-a>[Netscore V1]</n-a></router-link></n-li>
+      <n-li><router-link :to="{ name: 'netscore-v3' }"><n-a>[Netscore V3]</n-a></router-link></n-li>
+      <n-li><n-a href="netscore-v2/schematics/main-board-schematic.pdf" target="_blank">[Main Board Schematic]</n-a></n-li>
+      <n-li><n-a href="netscore-v2/schematics/display-board-schematic.pdf" target="_blank">[Display Board Schematic]</n-a></n-li>
+      <n-li><n-a href="netscore-v2/schematics/display-board-big-schematic.pdf" target="_blank">[Big Display Board Schematic]</n-a></n-li>
     </n-ul>
   </ProjectTemplate>
 </template>
@@ -72,6 +75,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
+import LazyIframe from '../../components/LazyIframe.vue';
 import ProjectTemplate from '../../components/ProjectTemplate.vue';
 import { IMedia, ICascadeCategory } from '../../models/media';
 

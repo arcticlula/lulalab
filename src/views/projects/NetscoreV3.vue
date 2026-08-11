@@ -34,7 +34,7 @@
 
     <n-p class="squid-semi-title">Scoreboard Simulation</n-p>
     <n-p>Press the buttons in the remotes to navigate and hold to enter the menus. This is the V2 simulator - the display feature set didn't change in V3.</n-p>
-    <iframe src="netscore-v2/component/index.html" class="netscore-iframe" scrolling="no" loading="lazy"></iframe>
+    <LazyIframe src="netscore-v2/component/index.html" class="netscore-iframe" scrolling="no" />
 
     <n-p class="squid-semi-title">Key Features</n-p>
     <n-ul>
@@ -58,12 +58,14 @@
       <n-li>Programming: <span class="squid-text-alt">C/C++ (ESP-IDF)</span></n-li>
     </n-ul>
 
-    <n-p class="squid-semi-title">Boards in this Release</n-p>
+    <!--
+      <n-p class="squid-semi-title">Boards in this Release</n-p>
     <n-ul>
       <n-li>Main Board v3.0: ESP32-S3, charging and protection, power path, audio and the two display slots.</n-li>
       <n-li>Display Board v3.0: 6x 0.2in digits (time and sets), 4x 0.8in score digits, 4 bar LEDs, 4 generic leds for each side and 2 for status.
         all on one TLC5951 across a 4-phase multiplex - 24 channels x 4 phases gives us 96 addressable LED positions.</n-li>
     </n-ul>
+    -->
 
     <n-p class="squid-semi-title">Challenges &amp; Lessons Learned</n-p>
     <n-p>The board has been ordered so it's a matter of time till this gets filled up, hopefully with nothing major.    </n-p><!-- 
@@ -79,11 +81,11 @@
 
     <n-p class="squid-semi-title">Links</n-p>
     <n-ul>
-      <n-li><router-link :to="{ name: 'netscore-v2' }"><n-a>[Netscore V2]</n-a></router-link></n-li>
-      <n-li><router-link :to="{ name: 'netscore' }"><n-a>[Netscore V1]</n-a></router-link></n-li>
       <n-li><n-a href="https://github.com/arcticlula/Netscore">[GitHub Repository]</n-a></n-li>
-      <n-li><n-a href="netscore-v3/schematics/main-board-schematic.pdf" target="_blank">[Main Board Schematic - PDF]</n-a></n-li>
-      <n-li><n-a href="netscore-v3/schematics/display-board-big-schematic.pdf" target="_blank">[Big Display Board Schematic - PDF]</n-a></n-li>
+      <n-li><router-link :to="{ name: 'netscore' }"><n-a>[Netscore V1]</n-a></router-link></n-li>
+      <n-li><router-link :to="{ name: 'netscore-v2' }"><n-a>[Netscore V2]</n-a></router-link></n-li>
+      <n-li><n-a href="netscore-v3/schematics/main-board-schematic.pdf" target="_blank">[Main Board Schematic]</n-a></n-li>
+      <n-li><n-a href="netscore-v3/schematics/display-board-big-schematic.pdf" target="_blank">[Big Display Board Schematic]</n-a></n-li>
     </n-ul>
   </ProjectTemplate>
 </template>
@@ -91,6 +93,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
+import LazyIframe from '../../components/LazyIframe.vue';
 import ProjectTemplate from '../../components/ProjectTemplate.vue';
 import { IMedia, ICascadeCategory } from '../../models/media';
 

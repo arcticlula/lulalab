@@ -8,7 +8,7 @@
       The second version moved to a custom PCB I designed, keeping the same core functionality but still in a more compact format.
     </n-p>
     <n-p>
-      Although the project was eventually scrapped, many of its ideas carried over into <router-link :to="{ name: 'netscore' }"><n-a>NetScore</n-a></router-link>, which now handles score tracking through BLE button inputs. 
+      Although the project was eventually scrapped, many of its ideas carried over into <router-link :to="{ name: 'netscore' }"><n-a>Netscore</n-a></router-link>, which now handles score tracking through BLE button inputs. 
       The keeper-switching logic might make a comeback there someday — though lately I've been playing more volleyball than football.    
     </n-p>
     <n-p class="squid-semi-title">Key Features</n-p>
@@ -32,7 +32,7 @@
     <n-p>
       While the project was eventually scrapped as a standalone device, but it was a good exercise in rapid hardware prototyping. 
       The buzzer was louder than expected, which was great since we played mostly outdoors. 
-      Its core concepts (scorekeeping mostly) inspired and carried over into my later NetScore project, demonstrating how ideas from one prototype can seed a more ambitious successor.
+      Its core concepts (scorekeeping mostly) inspired and carried over into my later Netscore project, demonstrating how ideas from one prototype can seed a more ambitious successor.
     </n-p>
 
     <n-p class="squid-semi-title">Links</n-p>

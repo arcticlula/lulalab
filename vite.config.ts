@@ -25,5 +25,7 @@ export default defineConfig({
   optimizeDeps: {
     include: ['three']
   },
-  base: "/electrolula/"
+  // relative, so the same build works under a project path
+  // (arcticlula.github.io/lulalab/) and at a domain root (lulalab.pt)
+  base: "./"
 })

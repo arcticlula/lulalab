@@ -2,14 +2,17 @@
   <ProjectTemplate id="netscore" :media="media" :models="models">
     <n-p class="squid-semi-title">The Story</n-p>
     <n-p>
-      NetScore is a scoreboard system designed to track game scores in real time using one or more Bluetooth buttons. 
+      Netscore is a scoreboard system designed to track game scores in real time using one or more Bluetooth buttons. 
       Each button can be assigned to increase the home or away score, making it easy for players/anyone to update the display wirelessly. 
-      The system runs (for now) on an ESP32-S2 and drives 3 pairs of multiplexed 7-segment displays, showing both points and sets. 
+      The system runs on an ESP32-S2 and drives 3 pairs of multiplexed 7-segment displays, showing both points and sets. 
       To ensure the score is visible from both sides of the court, the displays are mirrored on a back-to-back board.
     </n-p>
     <n-p>
       Originally, the plan was to increment the score directly on the device itself - it's mounted on the net, so anyone nearby could press a button to update it. 
-      After some feedback from my friends, it became clear that external BLE buttons would be a better approach. That's where I hit a snag: the ESP32-S2 lacks native Bluetooth. 
+      After some feedback from my friends, it became clear that external BLE buttons would be a better approach. 
+    </n-p>
+    <n-p>
+      That's where I hit a snag: the ESP32-S2 lacks native Bluetooth. 
       Instead of starting over right away, I added a separate ESP32 to act as a "Bluetooth hub." This ESP32 handles all Bluetooth input and forwards events to the ESP32-S2 controller via ESP-NOW -
       a proprietary peer-to-peer communication protocol. Some of the structural ideas were inherited from <router-link :to="{ name: 'goalie-rotation-timer' }"><n-a>Goalie Rotation Timer</n-a></router-link>, 
       and I plan to merge both concepts - scoring and timed rotations, for football - in a future version.
@@ -17,7 +20,7 @@
     
     <n-p class="squid-semi-title">Scoreboard Simulation</n-p>
     <n-p>Press the buttons in the remotes to navigate and hold to enter the menus.</n-p>
-    <iframe src="netscore/component/index.html" class="netscore-iframe" loading="lazy"></iframe>
+    <LazyIframe src="netscore/component/index.html" class="netscore-iframe" />
     
     <n-p class="squid-semi-title">Key Features</n-p>
     <n-ul>
@@ -34,7 +37,7 @@
       <n-li>Display Drivers: <span class="squid-text-alt">TLC5940 Constant-Current LED Driver + 3 MOSFETs (for multiplexing the 7-segment displays) </span></n-li>
       <n-li>Sound: <span class="squid-text-alt">Passive Buzzer, driven directly from a GPIO through a small FET</span></n-li>
       <n-li>Power: <span class="squid-text-alt">1S Li-ion, TP4056 charger + FS312MH protection + AP2112K-3.3 LDO</span></n-li>
-      <n-li>Ambient Light: <span class="squid-text-alt">BH1750FVI for automatic brightness - designed in, but never actually soldered: it ended up somewhere on the board where it couldn't see anything useful</span></n-li>
+      <n-li>Ambient Light: <span class="squid-text-alt">BH1750FVI for automatic brightness - designed in, but never actually soldered: it ended up somewhere on the board where it couldn't measure anything useful</span></n-li>
       <n-li>Programming: <span class="squid-text-alt">C/C++ (ESP-IDF)</span></n-li>
     </n-ul>
     <n-p class="squid-semi-title">Challenges & Lessons Learned</n-p>
@@ -63,6 +66,10 @@
     <n-ul>
       <n-li><n-a href="https://github.com/arcticlula/Netscore">[GitHub Repository]</n-a></n-li>
       <n-li><n-a href="https://cad.onshape.com/documents/5af115b264f13c6d19cfb86a/w/78d0cccd4b7bd4c9cd24db7d/e/aa530ea7120c1b1ae398de3b?renderMode=0&uiState=6920aefbc94d45a0ef83195a">[Onshape]</n-a></n-li>
+      <n-li><router-link :to="{ name: 'netscore-v2' }"><n-a>[Netscore V2]</n-a></router-link></n-li>
+      <n-li><router-link :to="{ name: 'netscore-v3' }"><n-a>[Netscore V3]</n-a></router-link></n-li>
+      <n-li><n-a href="netscore/schematics/main-board-schematic.pdf" target="_blank">[Main Board Schematic]</n-a></n-li>
+      <n-li><n-a href="netscore/schematics/display-board-schematic.pdf" target="_blank">[Display Board Schematic]</n-a></n-li>
     </n-ul>
   </ProjectTemplate>
 </template>
@@ -70,6 +77,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
+import LazyIframe from '../../components/LazyIframe.vue';
 import ProjectTemplate from '../../components/ProjectTemplate.vue';
 import { IMedia, ICascadeCategory } from '../../models/media';
 

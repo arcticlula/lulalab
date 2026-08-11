@@ -66,15 +66,17 @@ import { projectData } from '../data/projects';
 const failedAvif = ref(false);
 const router = useRouter();
 
+const visibleProjects = computed(() => projectData.filter(p => !p.hidden));
+
 const recentProjects = computed(() => {
-  return [...projectData]
+  return [...visibleProjects.value]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 3);
 });
 
 function goToRandomProject() {
-  const randomIndex = Math.floor(Math.random() * projectData.length);
-  const randomProject = projectData[randomIndex];
+  const pool = visibleProjects.value;
+  const randomProject = pool[Math.floor(Math.random() * pool.length)];
   router.push({ name: randomProject.routeName });
 }
 </script>

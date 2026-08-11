@@ -25,28 +25,58 @@
         />
       </div>
       <div class="tree-content">
-        <div 
-          v-for="project in filteredProjects" 
-          :key="project.name" 
+        <div
+          v-for="project in displayedProjects"
+          :key="project.name"
           :id="'project-' + project.name"
           class="project-details"
         >
           <div class="post-date">{{ formatMonthYear(project.date) }}</div>
           <div class="post-title squid-title">{{ project.name }}</div>
-          
+
           <div class="project-media-container">
             <router-link :to="{ name: project.routeName }">
-              <img v-if="project.srcType === 'image'" class="project-media" :src="project.src">
-              <video
-                v-else-if="project.srcType === 'video'"
-                class="project-media"
-                :src="project.src"
-                autoplay
-                loop
-                muted
-                playsinline
-                preload="auto"
-              />
+              <!-- Images: use <picture> for graceful fallback -->
+              <template v-if="project.srcType === 'image'">
+                <picture v-if="!failedAvif.has(project.name)">
+                  <source :srcset="project.avifSrc" type="image/avif" />
+                  <img
+                    class="project-media"
+                    :src="project.originalSrc"
+                    :alt="project.name + ' preview'"
+                    loading="lazy"
+                    @error="onImageAvifFail(project)"
+                  />
+                </picture>
+                <img
+                  v-else
+                  class="project-media"
+                  :src="project.originalSrc"
+                  :alt="project.name + ' preview'"
+                  loading="lazy"
+                />
+              </template>
+              <!-- Videos: prefer AVIF still; fallback to video if AVIF fails -->
+              <template v-else>
+                <img
+                  v-if="!failedAvif.has(project.name)"
+                  class="project-media"
+                  :src="project.avifSrc"
+                  :alt="project.name + ' video preview'"
+                  loading="lazy"
+                  @error="onVideoAvifFail(project)"
+                />
+                <video
+                  v-else
+                  class="project-media"
+                  :src="project.originalSrc"
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  preload="auto"
+                />
+              </template>
             </router-link>
           </div>
           
@@ -192,7 +222,7 @@
 
   const activeTags = ref<string[]>([]);
 
-  const projects = ref<Project[]>(projectData);
+  const projects = ref<Project[]>(projectData.filter(p => !p.hidden));
 
   import { useAvif } from '../composables/useAvif';
   const { deriveAvifPath } = useAvif();

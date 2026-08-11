@@ -10,6 +10,7 @@ declare module 'vue' {
     ColorPickerModal: typeof import('./src/components/ColorPickerModal.vue')['default']
     CVEntry: typeof import('./src/components/CVEntry.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+    LazyIframe: typeof import('./src/components/LazyIframe.vue')['default']
     LogLoader: typeof import('./src/components/LogLoader.vue')['default']
     LogTemplate: typeof import('./src/components/LogTemplate.vue')['default']
     MediaCarousel: typeof import('./src/components/MediaCarousel.vue')['default']

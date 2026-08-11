@@ -1,5 +1,5 @@
 {
-  "name": "electrolula",
+  "name": "lulalab",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,7 +10,7 @@
     "build": "vue-tsc && vite build",
     "preview": "vite preview"
   },
-  "homepage": "https://arcticlula.github.io/electrolula/",
+  "homepage": "https://lulalab.pt/",
   "dependencies": {
     "@types/three": "^0.181.0",
     "three": "^0.181.1",

@@ -3,7 +3,7 @@
     <n-p class="squid-semi-title">The Story</n-p>
     <n-p>
       This project was born from a happy accident. I had some leftover WS2811 LED strips from my <router-link :to="{ name: 'toDo' }"><n-a>thesis project</n-a></router-link> 
-      and a few plexiglass samples that I had originally ordered for the <router-link :to="{ name: 'netscore' }"><n-a>NetScore</n-a></router-link> project - I thought they'd be clear display protectors, 
+      and a few plexiglass samples that I had originally ordered for the <router-link :to="{ name: 'netscore' }"><n-a>Netscore</n-a></router-link> project - I thought they'd be clear display protectors, 
       but they turned out to be translucent. This "mistake", however, turned out to be a pretty good material for a light diffuser.
       I designed a simple enclosure in Onshape, consisting of a 3D-printed frame that wraps around the plexiglass panel, with the LED strip running along the inner perimeter. 
       The result is a soft, almost uniform glow.

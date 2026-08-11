@@ -79,6 +79,12 @@ const routes: Array<RouteRecordRaw> = [
         meta: { background: 'black' }
       },
       {
+        path: 'lulalab',
+        name: 'lulalab',
+        component: () => import("../views/projects/Lulalab.vue"),
+        meta: { background: 'black' }
+      },
+      {
         path: 'comando-rita',
         name: 'comando-rita',
         component: () => import("../views/projects/ComandoRita.vue"),
