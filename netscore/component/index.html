@@ -112,8 +112,6 @@
             .scoreboard-container {
                 padding: 15px 20px;
                 gap: 10px;
-                transform: scale(0.5);
-                transform-origin: top center;
                 box-sizing: border-box;
             }
 
@@ -122,7 +120,6 @@
             }
 
             .digit-container {
-                /* Let scale handle the resizing, but ensure spacing is tight */
                 margin: 0 2px;
             }
         }
@@ -273,7 +270,6 @@
 
         @media (max-width: 768px) {
             .remotes-wrapper {
-                margin-top: -100px;
                 gap: 10px;
                 width: 100%;
                 padding: 0 10px;
@@ -529,6 +525,19 @@
                 }
             });
         }
+
+        // Shrinks the scoreboard to the frame width; zoom (unlike transform) shrinks its layout box too
+        const scoreboard = document.querySelector('.scoreboard-container');
+        const FIT_MARGIN = 16;
+
+        function fitScoreboard() {
+            scoreboard.style.zoom = 1;
+            const room = document.body.clientWidth - FIT_MARGIN;
+            scoreboard.style.zoom = Math.min(1, room / scoreboard.offsetWidth);
+        }
+
+        fitScoreboard();
+        window.addEventListener('resize', fitScoreboard);
 
         let isMuted = true;
         const muteBtn = document.getElementById('muteBtn');

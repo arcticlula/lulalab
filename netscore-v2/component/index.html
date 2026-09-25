@@ -390,11 +390,6 @@
             .main-layout {
                 gap: 20px;
             }
-
-            .scoreboard-container {
-                transform: scale(0.85);
-                transform-origin: center;
-            }
         }
 
         @media (max-width: 768px) {
@@ -426,9 +421,6 @@
 
             .scoreboard-container {
                 flex-shrink: 0;
-                transform: scale(0.42);
-                transform-origin: top center;
-                margin-bottom: -185px;
             }
 
             .board-controls {
@@ -950,6 +942,24 @@
                 }
             });
         }
+
+        // Shrinks the scoreboard to the frame width; zoom (unlike transform) shrinks its layout box too
+        const scoreboard = document.querySelector('.scoreboard-container');
+        const mainLayout = document.querySelector('.main-layout');
+        const boardControls = document.querySelector('.board-controls');
+        const FIT_MARGIN = 16;
+
+        function fitScoreboard() {
+            scoreboard.style.zoom = 1;
+            const layout = getComputedStyle(mainLayout);
+            // On mobile the jog dial is absolutely positioned, so only the row layout loses width to it
+            const beside = layout.flexDirection === 'row' ? boardControls.offsetWidth + parseFloat(layout.columnGap) : 0;
+            const room = document.body.clientWidth - beside - FIT_MARGIN;
+            scoreboard.style.zoom = Math.min(1, room / scoreboard.offsetWidth);
+        }
+
+        fitScoreboard();
+        window.addEventListener('resize', fitScoreboard);
 
         let isMuted = true;
         const muteBtn = document.getElementById('muteBtn');
