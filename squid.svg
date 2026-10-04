@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <path d="M14 0H50A14 14 0 0 1 64 14V50A14 14 0 0 1 50 64H14A14 14 0 0 1 0 50V14A14 14 0 0 1 14 0Z" fill="#63e2b7"/>
+  <g fill="#101014">
+    <!-- fins -->
+    <path d="M25 16C16 19 11 23 12 27C16 30 21 30 25 28Z"/>
+    <path d="M39 16C48 19 53 23 52 27C48 30 43 30 39 28Z"/>
+    <!-- mantle -->
+    <path d="M32 10C23 15 16 23 16 32C16 39 48 39 48 32C48 23 41 15 32 10Z"/>
+  </g>
+  <!-- tentacles -->
+  <g fill="none" stroke="#101014" stroke-width="4.5" stroke-linecap="round">
+    <path d="M20 35C15 42 17 47 12 52"/>
+    <path d="M26 37C23 44 26 49 22 55"/>
+    <path d="M38 37C41 44 38 49 42 55"/>
+    <path d="M44 35C49 42 47 47 52 52"/>
+  </g>
+  <!-- eyes -->
+  <g fill="#63e2b7">
+    <circle cx="26" cy="28" r="3.6"/>
+    <circle cx="38" cy="28" r="3.6"/>
+  </g>
+</svg>
